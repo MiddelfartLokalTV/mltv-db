@@ -10,10 +10,13 @@
 
 script="${SCRIPT_NAME}"
 path="${script%/*}"
+db="/var/tmp/mltv.db"
 
 # ====
 # Functions
 # ====
+
+[ ! -f "$db" ] && cat schema | sqlite3 $db
 
 html_header() {
 	cat << EOT
@@ -90,6 +93,36 @@ EOT
 # Routing
 # ====
 
+case " $(POST) " in
+	*\ create\ *)
+		title="$(GET title)"
+		p="$(GET p)"
+		music="$(GET music)"
+		producer="$(GET producer)"
+		exp_done="$(GET exp_done)"
+		exp_length="$(GET exp_length)"
+		[ -z "$p" ] && p="NULL"
+		sqlite3 $db "INSERT INTO projects VALUES ( $p, \"$title\", $producer, \"$music\", \"$exp_done\", \"$exp_length\", \"$participants\" );"
+		local err=$?
+		if [ "$err" == "0" ]; then
+			header "Location: ${script}?view&p=$p"
+			exit 0
+		else
+			cat << EOT
+$(html_header)
+$(html_dashboard)
+	<h2>Kunne ikke oprette projekt!</h2>
+	<p>Følgende fejlkode blev afgivet af SQLite3: $err</p>
+	<p>(mere information om fejlkoder kan findes på sqlite3.org</p>
+$(html_footer)
+EOT
+			exit 0
+		fi
+		;;
+	*\ delete\ *)
+		;;
+esac
+
 case " $(GET) " in
 	*\ create\ *)
 		if [ "$(GET create)" == "new" ]; then
@@ -119,9 +152,21 @@ case " $(GET) " in
 							<td>Producer:</td>
 							<td>
 								<select name="producer">
-									<option value="1" label="Bent Ove Hansen" />
+									<option value="1">Bent Ove Hansen</option>
 								</select>
 							</td>
+						</tr>
+						<tr>
+							<td>Musik:</td>
+							<td><input type="text" name="music" /></td>
+						</tr>
+						<tr>
+							<td>Forventet færdig:</td>
+							<td><input type="datetime-local" name="exp_done" /></td>
+						</tr>
+						<tr>
+							<td>Forventet længde:</td>
+							<td><input type="datetime-local" name="exp_length" /></td>
 						</tr>
 					</tbody>
 				</table>
