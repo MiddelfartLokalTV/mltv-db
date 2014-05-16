@@ -98,6 +98,7 @@ case " $(POST) " in
 		title="$(GET title)"
 		p="$(GET p)"
 		music="$(GET music)"
+		participants="$(GET participants)"
 		producer="$(GET producer)"
 		exp_done="$(GET exp_done)"
 		exp_length="$(GET exp_length)"
@@ -155,6 +156,10 @@ case " $(GET) " in
 									<option value="1">Bent Ove Hansen</option>
 								</select>
 							</td>
+						</tr>
+						<tr>
+							<td>Deltagende:</td>
+							<td><textarea name="participants"></textarea></td>
 						</tr>
 						<tr>
 							<td>Musik:</td>
