@@ -24,16 +24,8 @@ DEBUG=yes
 
 [ ! -f "$db" ] && cat schema | sqlite3 $db
 
-html_header() {
+html_style() {
 	cat << EOT
-<!doctype html>
-<html>
-	<head>
-		<meta charset="utf8">
-		<link rel="icon" type="image/png"
-			href="logo_traced.png" />
-		<title>$TITLE</title>
-		<style>
 			body {
 				background-color: #ddd;
 				margin: 0;
@@ -68,6 +60,23 @@ html_header() {
 				float: right;
 				display: block;
 			}
+			pre {
+				margin-top: 0;
+				background: #f5f5f5;
+				border: 0.1em solid #55f;
+				border-top: 0.1em solid #555;
+				border-radius: 0em 0em 0.5em 0.5em;
+				padding: 0.25em;
+			}
+			pre.header {
+				margin-bottom: 0;
+				background: #f5f5f5;
+				border: 0.±2em solid #555;
+				border-bottom: 0;
+				border-radius: 0;
+				padding: 0.25em;
+			}
+
 			#footer {
 				text-align: center;
 			}
@@ -75,6 +84,21 @@ html_header() {
 			.clear {
 				clear: both;
 			}
+
+EOT
+}
+
+html_header() {
+	cat << EOT
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf8">
+		<link rel="icon" type="image/png"
+			href="logo_traced.png" />
+		<title>$TITLE</title>
+		<style>
+			$(html_style)
 		</style>
 	</head>
 	<body>
@@ -110,7 +134,7 @@ EOT
 		do
 			proj_id="$(echo $proj | cut -d '|' -f 1)"
 			proj_title="$(echo $proj | cut -d '|' -f 2)"
-			[ "${#proj_title}" -gt "40" ] && proj_title="${proj_title:0:40}"
+			[ "${#proj_title}" -gt "40" ] && proj_title="${proj_title:0:37}..."
 			cat << EOT
 			<tr>
 				<td><a href="${script}?view&amp;p=$proj_id">$proj_id</a></td>
@@ -169,13 +193,28 @@ $(html_dashboard)
 	<h2>Kunne ikke oprette projekt!</h2>
 	<p>Følgende fejlkode blev afgivet af SQLite3: $err</p>
 	<p>(mere information om fejlkoder kan findes på <a href="https://sqlite.org/c3ref/c_abort.html">sqlite3.org</a>.)</p>
-	$([ "$DEBUG" ] && echo "<p>SQL var følgende: INSERT INTO projects VALUES( $p, \"$title\", $producer, \"$music\", \"$exp_done\", \"$exp_length\", \"$participants\" );</p>")
+	<pre class="header">Mener du at dette er en fejl i systemet, så send følgende tekst til system operatøren:
+</pre>
+	<pre>\$cmd = sqlite3 \$db INSERT INTO projects VALUES( $p, "$title", $producer, "$music", "$exp_done", "$exp_length", "$participants" );<br/>\$err = $err</pre>
 $(html_footer)
 EOT
 			exit 0
 		fi
 		;;
 	*\ delete\ *)
+		p=$(POST p)
+		sqlite3 $db "DELETE FROM projects WHERE id == $p;"
+		local err="$?"
+		[ "$err" == "0" ] && header "Location: ${script}"
+		header
+		cat << EOT
+$(html_header)
+$(html_dashboard)
+	<h4>Kunne ikke slette projekt: $p!</h4>
+	<p>SQL fejlkode: $err</p>
+$(html_footer)
+EOT
+		exit 0
 		;;
 esac
 
@@ -274,6 +313,19 @@ EOT
 		;;
 	*\ delete\ *)
 		p="$(GET p)"
+		header
+		cat << EOT
+$(html_header)
+$(html_dashboard)
+	<h3>Er du sikker på at du vil slette projekt $p?</h3>
+	<p><b>ADVARSEL</b>: Følgende handling kan ikke fortrydes, uden system administratorens ekspertise!</p>
+	<form action="${script}" method="post">
+		<input type="hidden" name="delete" value="delete" />
+		<input type="hidden" name="p" value="${p}" />
+		<input type="submit" value="Slet" />
+	</form>
+$(html_footer)
+EOT
 		;;
 	*\ search\ *)
 		terms="$(GET search)"
@@ -290,7 +342,10 @@ EOT
 		header
 		html_header
 		html_dashboard
-		projects=$(sqlite3 $db "SELECT * FROM projects ORDER BY id DESC")
+		LIMIT=20
+		startid="$(GET startid)"
+		[ -z "$startid" ] && startid=$(sqlite3 $db "SELECT MAX(id) FROM projects")
+		projects=$(sqlite3 $db "SELECT * FROM projects WHERE id <= $startid ORDER BY id DESC LIMIT $LIMIT")
 		while read proj
 		do
 			proj_id="$(echo $proj | cut -d '|' -f 1 )"
@@ -301,6 +356,10 @@ EOT
 EOT
 		done << EOT
 $projects
+EOT
+		nextid=$(expr $startid - $LIMIT)
+		cat << EOT
+		<a href="${script}?browse&amp;startid=$nextid">Flere</a>
 EOT
 		html_footer
 		;;
@@ -320,7 +379,7 @@ EOT
 		Klik blot "<a href="${script}?create">Opret projekt</a>", og du er igang.
 		</p>
 		<p>
-		Du kan gennemse alle projekter ved at klikke på "<a href="${script}?browse">Gennemse projekter</a>" øverst, og ønsker du at søge, kan du blot skrive i søgefeltet, og trykke <i>ENTER</i>, for at søge på projektnumre, meta-tags, titlen, og alt andet information.
+		Du kan gennemse alle projekter ved at klikke på "<a href="${script}?browse">Gennemse projekter</a>" øverst, og ønsker du at søge, kan du blot skrive i søgefeltet og trykke <i>ENTER</i>, for at søge på projektnumre, beskrivelser, titler, og alt andet information.
 		</p>
 EOT
 		html_footer
