@@ -1,0 +1,44 @@
+/* 
+ * This table contains all project meta-data and information.
+ * The id corresponds to the project id, and should be used to look up videos.
+ * The value 'participants' is simply a list of integers corresponding to an
+ * id in the members variables.
+ */
+CREATE TABLE projects ( id INTEGER PRIMARY KEY,
+	title TEXT UNIQUE,
+	desc TEXT,
+	producer INTEGER,
+	category TEXT,
+	music TEXT,
+	expected_done TEXT,
+	expected_length TEXT,
+	participants TEXT );
+
+/*
+ * This table contains all members of MLTV. Each must have at least an id
+ * and a name, rendering both phone and email optional.
+ * However, in spite of being optional, at least one of email or phone
+ * should be mandatory for non-temporary (employed, etc) members.
+ */
+CREATE TABLE members ( id INTEGER PRIMARY KEY,
+	name TEXT,
+	phone TEXT,
+	email TEXT );
+
+/*
+ * To maintain a fast and almost-instant speed when searching and browsing projects,
+ * we create and maintain an index of ALL information.
+ */
+CREATE INDEX index_projects ON projects( id, title, desc, producer, music, participants );
+
+/*
+ * We'll need an index on all categories as well, considering that their data is unlikely to change
+ * much over time. Shouldn't present a performance issue.
+ */
+CREATE INDEX index_category ON projects( category );
+
+/*
+ * To maintain a fast and almost-instant speed when searching and browsing membmers,
+ * we create and maintain an index of ALL information.
+ */
+CREATE INDEX index_membmers ON members( name, phone, email );
