@@ -120,7 +120,7 @@ html_dashboard() {
 		</div>
 		<div class="clear"></div>
 		<div id="content">
-			<img id="logo" src="logo_traced.png"></img>
+			<a href="${script}"><img id="logo" src="logo_traced.png"></img></a>
 			<br />
 EOT
 }
@@ -175,12 +175,13 @@ case " $(POST) " in
 		desc="$(POST desc)"
 		p="$(POST p)"
 		music="$(POST music)"
+		category="$(POST category)"
 		participants="$(POST participants)"
 		producer="$(POST producer)"
 		exp_done="$(POST exp_done)"
 		exp_length="$(POST exp_length)"
 		[ -z "$p" ] && p=NULL
-		sqlite3 $db "INSERT INTO projects VALUES ( $p, \"$title\", \"$desc\", $producer, \"$music\", \"$exp_done\", \"$exp_length\", \"$participants\" );"
+		sqlite3 $db "INSERT INTO projects VALUES ( $p, \"$title\", \"$desc\", $producer,\"$category\", \"$music\", \"$exp_done\", \"$exp_length\", \"$participants\" );"
 		local err=$?
 		if [ "$err" == "0" ]; then
 			[ $p == NULL ] && p=$(sqlite3 $db "SELECT MAX(id) FROM projects;")
@@ -253,6 +254,10 @@ case " $(GET) " in
 							</td>
 						</tr>
 						<tr>
+							<td>Kategori</td>
+							<td><input text="text" name="category" /></td>
+						</tr>
+						<tr>
 							<td>Beskrivelse</td>
 							<td><textarea name="desc"></textarea></td>
 						</tr>
@@ -292,21 +297,39 @@ EOT
 
 		proj_title="$(echo $info | cut -d '|' -f 2)"
 		proj_desc="$(echo $info | cut -d '|' -f 3)"
-		proj_producer="$(echo $info | cut -d '|' -f 4)"
-		proj_music="$(echo $info | cut -d '|' -f 5)"
-		proj_exp_done="$(echo $info | cut -d '|' -f 6)"
-		proj_exp_length="$(echo $info | cut -d '|' -f 7)"
-		proj_participants="$(echo $info | cut -d '|' -f 8)"
+		proj_producer_id="$(echo $info | cut -d '|' -f 4)"
+		proj_producer=$(sqlite3 $db "SELECT name FROM members WHERE id == $proj_producer")
+		proj_category="$(echo $info | cut -d '|' -f 5)"
+		proj_music="$(echo $info | cut -d '|' -f 6)"
+		proj_exp_done="$(echo $info | cut -d '|' -f 7)"
+		proj_exp_length="$(echo $info | cut -d '|' -f 8)"
+		proj_participants="$(echo $info | cut -d '|' -f 9)"
+
+		if [ -z "$proj_producer" ]; then
+			proj_producer="(ukendt)"
+		else
+			proj_producer="<a href=\"${script}?member&amp;id=$proj_producer_id\">$proj_producer</a>"
+		fi
 
 		cat << EOT
-		<br />
-		proj_title: $proj_title<br/>
-		proj_desc: $proj_desc<br/>
-		proj_producer: $proj_producer<br/>
-		proj_music: $proj_music<br/>
-		proj_exp_done: $proj_exp_done<br/>
-		proj_exp_length: $proj_exp_length<br/>
-		proj_participants: $proj_participants<br/>
+		<table>
+			<tr>
+				<td>Titel: $proj_title</td>
+				<td>Producer: $proj_producer</td>
+			</tr>
+			<tr>
+				<td>Beskrivelse: $proj_desc</td>
+				<td>Kategori: <a href="${script}?browse&amp;cat=$proj_category">$proj_category</a></td>
+			</tr>
+			<tr>
+				<td>Musik: $proj_music</td>
+				<td>Deltagere: $proj_participants</td>
+			</tr>
+			<tr>
+				<td>Forventet færdig: $proj_exp_done</td>
+				<td>Forventet længde: $proj_exp_length</td>
+			</tr>
+		</table>
 EOT
 
 		html_footer
@@ -340,13 +363,34 @@ EOT
 		html_footer
 		;;
 	*\ browse\ *)
+		category="$(GET cat)"
+		startid="$(GET startid)"
+		LIMIT=20
+		TITLE=
+		[ -z "$startid" ] && startid=$(sqlite3 $db "SELECT MAX(id) FROM projects")
+		if [ -n "${category}" ]; then
+			projects=$(sqlite3 $db "SELECT * FROM projects WHERE id <= $startid AND category == $category ORDER BY id DESC LIMIT $LIMIT")
+			TITLE="Database: Gennemse $category"
+		else
+			projects=$(sqlite3 $db "SELECT * FROM projects WHERE id <= $startid ORDER BY id DESC LIMIT $LIMIT")
+			TITLE="Database: Gennemse alle"
+		fi
 		header
 		html_header
 		html_dashboard
-		LIMIT=20
-		startid="$(GET startid)"
-		[ -z "$startid" ] && startid=$(sqlite3 $db "SELECT MAX(id) FROM projects")
-		projects=$(sqlite3 $db "SELECT * FROM projects WHERE id <= $startid ORDER BY id DESC LIMIT $LIMIT")
+		categories=$(sqlite3 $db "SELECT category FROM projects")
+		if [ -n "${categories}" ]; then
+			echo "<div id='sidebar'>"
+			while read cat
+			do
+				cat << EOT
+			<a href="${script}?browse&amp;cat=$cat">$cat</a><br />
+EOT
+			done << EOT
+$categories
+EOT
+			echo "</div>"
+		fi
 		while read proj
 		do
 			proj_id="$(echo $proj | cut -d '|' -f 1 )"
