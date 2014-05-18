@@ -55,6 +55,7 @@ html_style() {
 			#sidebar {
 				background: #fefefe;
 				border: 0.1em solid #ddd;
+				box-shadow: 0 0.1em 0.2em #000;
 				min-width: 10em;
 				padding: 0.5em;
 				float: right;
