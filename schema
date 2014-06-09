@@ -5,14 +5,24 @@
  * id in the members variables.
  */
 CREATE TABLE projects ( id INTEGER PRIMARY KEY,
-	title TEXT UNIQUE,
+	title TEXT,
 	desc TEXT,
 	producer INTEGER,
-	category TEXT,
+	editor INTEGER,
+	category INTEGER,
 	music TEXT,
+	created TEXT,
 	expected_done TEXT,
 	expected_length TEXT,
+	real_length TEXT,
+	release TEXT,
 	participants TEXT );
+
+/*
+ * The categories table contains a category identifier 'id', and the name of the category.
+ */
+CREATE TABLE categories ( id INTEGER PRIMARY KEY,
+	name TEXT );
 
 /*
  * This table contains all members of MLTV. Each must have at least an id
@@ -25,20 +35,3 @@ CREATE TABLE members ( id INTEGER PRIMARY KEY,
 	phone TEXT,
 	email TEXT );
 
-/*
- * To maintain a fast and almost-instant speed when searching and browsing projects,
- * we create and maintain an index of ALL information.
- */
-CREATE INDEX index_projects ON projects( id, title, desc, producer, music, participants );
-
-/*
- * We'll need an index on all categories as well, considering that their data is unlikely to change
- * much over time. Shouldn't present a performance issue.
- */
-CREATE INDEX index_category ON projects( category );
-
-/*
- * To maintain a fast and almost-instant speed when searching and browsing membmers,
- * we create and maintain an index of ALL information.
- */
-CREATE INDEX index_membmers ON members( name, phone, email );
