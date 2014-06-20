@@ -70,6 +70,10 @@ html_style() {
 			}
 			#project-view {
 				width: 100%;
+				word-wrap: break-word;
+			}
+			#project-view td {
+				width: 50%;
 			}
 			pre {
 				margin-top: 0;
@@ -450,7 +454,7 @@ EOT
 						</td>
 					</tr>
 					<tr>
-						<td>Beskrivelse</td>
+						<td>Beskrivelse til YouTube:</td>
 						<td><textarea name="desc">${proj_desc}</textarea></td>
 					</tr>
 					<tr>
