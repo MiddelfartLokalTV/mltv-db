@@ -14,7 +14,7 @@ script="${SCRIPT_NAME}"
 path="${script%/*}"
 db="/var/tmp/mltv.db"
 #script_url="https://chiselapp.com/user/mastersrp/repository/mltv-db"
-script_url="http://slitaz:8081"
+script_url="http://${HTTP_HOST%:8081}:8082"
 script_lastid=$(sqlite3 .repo.fossil "SELECT MAX(rid) FROM blob;")
 script_rev=$(sqlite3 .repo.fossil "SELECT uuid FROM blob WHERE rid == $script_lastid;")
 
@@ -28,8 +28,15 @@ DEBUG=yes
 
 html_style() {
 	cat << EOT
+		@import url(http://fonts.googleapis.com/css?family=Fira+Sans:300);
 			body {
+				font-family: 'Fira Sans', sans-serif;
 				background-color: #ddd;
+				margin: 0;
+				padding: 0;
+			}
+			ul {
+				display: inline;
 				margin: 0;
 				padding: 0;
 			}
@@ -46,9 +53,26 @@ html_style() {
 			}
 			#content {
 				padding: 1em;
+				min-height: 30em;
 			}
 			#dashboard {
 				border-bottom: 0.1em solid #55f;
+				padding-bottom: 0.2em;
+			}
+			.dashbtn {
+				background: #fafafa;
+				display: inline;
+				padding: 0.2em;
+				padding-top: 0;
+			}
+			.dashbtn:hover {
+				border-bottom: 0.1em solid #00cc10;
+				background: #f5f5f5;
+			}
+			#dashboard > li > a {
+				padding: 0.2em;
+				padding-top: 0;
+
 			}
 			#dashboard form {
 				float: right;
@@ -132,16 +156,16 @@ EOT
 
 html_dashboard() {
 	cat << EOT
-		<div id="dashboard">
-			<a href="${script}">Forside</a> |
-			<a href="${script}?member">Medlemmer</a> |
-			<a href="${script}?category">Kategorier</a> |
-			<a href="${script}?browse">Gennemse projekter</a> |
-			<a href="${script}?edit">Opret projekt</a>
-			<form method="get" action="${script}">
+		<ul id="dashboard">
+			<li class="dashbtn"><a href="${script}">Forside</a></li>
+			<li class="dashbtn"><a href="${script}?member">Medlemmer</a></li>
+			<li class="dashbtn"><a href="${script}?category">Kategorier</a></li>
+			<li class="dashbtn"><a href="${script}?browse">Gennemse projekter</a></li>
+			<li class="dashbtn"><a href="${script}?edit">Opret projekt</a></li>
+			<li class="dashbtn"><form method="get" action="${script}">
 				<input type="text" name="search" placeholder="Søg" />
-			</form>
-		</div>
+			</form></li>
+		</ul>
 		<div class="clear"></div>
 		<div id="content">
 			<div id="header">
@@ -455,7 +479,7 @@ EOT
 					</tr>
 					<tr>
 						<td>Beskrivelse til YouTube:</td>
-						<td><textarea name="desc">${proj_desc}</textarea></td>
+						<td><textarea cols="80" rows="12" name="desc">${proj_desc}</textarea></td>
 					</tr>
 					<tr>
 						<td>Deltagende:</td>
@@ -736,18 +760,14 @@ EOT
 		html_header
 		html_dashboard
 
-		results=$(sqlite3 $db "SELECT id,title FROM projects WHERE id LIKE $terms OR title LIKE $terms OR desc LIKE $terms OR music LIKE $terms OR participants LIKE $terms")
-		while read result
+		sqlite3 $db "SELECT id,title FROM projects WHERE id LIKE $terms OR title LIKE $terms OR desc LIKE $terms OR music LIKE $terms OR participants LIKE $terms"| while read result
 		do
 			result_id="$(echo $result | cut -d '|' -f 1)"
 			result_title="$(echo $result | cut -d '|' -f 2)"
 			cat << EOT
 			<a href="${script}?view&amp;p=$result_id">$result_id - $result_title</a>
 EOT
-		done << EOT
-$results
-EOT
-
+		done
 		html_footer
 		;;
 	*\ browse\ *)
@@ -830,7 +850,7 @@ EOT
 	*)
 		# "Dashboard" screen
 		TITLE="$TITLE - Database"
-		projects=$(sqlite3 $db "SELECT id,title FROM projects ORDER BY id DESC LIMIT 5")
+		projects=$(sqlite3 $db "SELECT id,title FROM projects ORDER BY id DESC LIMIT 15")
 		header
 		html_header
 		html_dashboard
@@ -843,7 +863,7 @@ EOT
 		Klik blot "<a href="${script}?create">Opret projekt</a>", og du er igang.
 		</p>
 		<p>
-		Du kan gennemse alle projekter ved at klikke på "<a href="${script}?browse">Gennemse projekter</a>" øverst, og ønsker du at søge, kan du blot skrive i søgefeltet og trykke <i>ENTER</i>, for at søge på projektnumre, beskrivelser, titler, og alt andet information.
+		Du kan gennemse alle projekter ved at klikke på "<a href="${script}?browse">Gennemse projekter</a>" øverst, og ønsker du at søge, kan du blot skrive i søgefeltet og trykke <code>ENTER</code>, for at søge på projektnumre, beskrivelser, titler, og alt andet information.
 		</p>
 EOT
 		html_footer
