@@ -47,7 +47,11 @@ a:hover {
 	float: right;
 	display: inline;
 }
-
+#sidebar {
+	float: right;
+	border: 0.1em solid #ddd;
+	box-shadow: 0 0.1em 0.1em #000;
+}
 #footer {
 	text-align: center;
 }
