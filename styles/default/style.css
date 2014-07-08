@@ -47,3 +47,7 @@ a:hover {
 	float: right;
 	display: inline;
 }
+
+#footer {
+	text-align: center;
+}
