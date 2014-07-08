@@ -10,14 +10,17 @@ TITLE="MLTV"
 # Variables
 # ====
 
+root="$(pwd)"
+styles="${root}/styles"
 script="${SCRIPT_NAME}"
 path="${script%/*}"
 db="/var/tmp/mltv.db"
 #script_url="https://chiselapp.com/user/mastersrp/repository/mltv-db"
-script_url="http://${HTTP_HOST%:8081}:8082"
+script_url="http://${HTTP_HOST%:*}:8082"
 script_lastid=$(sqlite3 .repo.fossil "SELECT MAX(rid) FROM blob;")
 script_rev=$(sqlite3 .repo.fossil "SELECT uuid FROM blob WHERE rid == $script_lastid;")
 
+STYLE="default"
 DEBUG=yes
 
 # ====
@@ -26,154 +29,11 @@ DEBUG=yes
 
 [ ! -f "$db" ] && cat schema | sqlite3 $db
 
-html_style() {
-	cat << EOT
-		@import url(http://fonts.googleapis.com/css?family=Fira+Sans:300);
-			body {
-				font-family: 'Fira Sans', sans-serif;
-				background-color: #ddd;
-				margin: 0;
-				padding: 0;
-			}
-			ul {
-				display: inline;
-				margin: 0;
-				padding: 0;
-			}
-			a {
-				color: #005;
-				text-decoration: none;
-			}
-			a:hover {
-				color: #00b;
-			}
-			#wrapper {
-				background-color: #fff;
-				border-bottom: 0.1em solid #55f;
-			}
-			#content {
-				padding: 1em;
-				min-height: 30em;
-			}
-			#dashboard {
-				border-bottom: 0.1em solid #55f;
-				padding-bottom: 0.2em;
-			}
-			.dashbtn {
-				background: #fafafa;
-				display: inline;
-				padding: 0.2em;
-				padding-top: 0;
-			}
-			.dashbtn:hover {
-				border-bottom: 0.1em solid #00cc10;
-				background: #f5f5f5;
-			}
-			#dashboard > li > a {
-				padding: 0.2em;
-				padding-top: 0;
-
-			}
-			#dashboard form {
-				float: right;
-				display: inline;
-			}
-			#header h2 {
-				text-align: center;
-				padding: 0;
-				margin: 0;
-			}
-			#sidebar {
-				background: #fefefe;
-				border: 0.1em solid #ddd;
-				box-shadow: 0 0.1em 0.2em #000;
-				min-width: 10em;
-				padding: 0.5em;
-				float: right;
-				display: block;
-			}
-			#project-view {
-				width: 100%;
-				word-wrap: break-word;
-			}
-			#project-view td {
-				width: 50%;
-			}
-			pre {
-				margin-top: 0;
-				background: #f5f5f5;
-				border: 0.1em solid #55f;
-				border-top: 0.1em solid #555;
-				border-radius: 0em 0em 0.5em 0.5em;
-				padding: 0.25em;
-			}
-			pre.header {
-				margin-bottom: 0;
-				background: #f5f5f5;
-				border: 0.±2em solid #555;
-				border-bottom: 0;
-				border-radius: 0;
-				padding: 0.25em;
-			}
-
-			#footer {
-				text-align: center;
-			}
-			
-			.clear {
-				clear: both;
-			}
-
-			@media print {
-				a { color: #000; }
-				a:visited { color: #000; }
-				#header img { float: right; }
-				#sidebar { display: none; }
-				#dashboard { display: none; }
-				#footer { display: none; }
-			}	
-
-EOT
-}
-
-html_header() {
-	cat << EOT
-<!doctype html>
-<html>
-	<head>
-		<meta charset="utf8">
-		<link rel="icon" type="image/png"
-			href="logo_traced.png" />
-		<title>$TITLE</title>
-		<style>
-			$(html_style)
-		</style>
-	</head>
-	<body>
-		<div id="wrapper">
-EOT
-}
-
-html_dashboard() {
-	cat << EOT
-		<ul id="dashboard">
-			<li class="dashbtn"><a href="${script}">Forside</a></li>
-			<li class="dashbtn"><a href="${script}?member">Medlemmer</a></li>
-			<li class="dashbtn"><a href="${script}?category">Kategorier</a></li>
-			<li class="dashbtn"><a href="${script}?browse">Gennemse projekter</a></li>
-			<li class="dashbtn"><a href="${script}?edit">Opret projekt</a></li>
-			<li class="dashbtn"><form method="get" action="${script}">
-				<input type="text" name="search" placeholder="Søg" />
-			</form></li>
-		</ul>
-		<div class="clear"></div>
-		<div id="content">
-			<div id="header">
-				<a href="${script}"><img id="logo" src="logo_traced.png" /></a>
-				$([ -n "$(GET view)" ] && [ -n "$(GET p)" ] && echo '<h2>Arbejdskort</h2>')
-			</div>
-			<br />
-EOT
+html_tmpl() {
+	tmpl="$1"
+	if [[ -f "${styles}/${STYLE}/${tmpl}.cgi" ]]; then
+		. ${styles}/${STYLE}/${tmpl}.cgi
+	fi
 }
 
 html_display_error() {
@@ -194,7 +54,7 @@ html_sidebar() {
 		<b>Nyligt oprettede projekter:</b>
 		<table>
 EOT
-		while read proj
+		sqlite3 $db "SELECT id,title FROM projects ORDER BY id DESC LIMIT 15" |	while read proj
 		do
 			proj_id="$(echo $proj | cut -d '|' -f 1)"
 			proj_title="$(echo $proj | cut -d '|' -f 2)"
@@ -205,9 +65,7 @@ EOT
 				<td><a href="${script}?view&amp;p=$proj_id">$proj_title</a></td>
 			</tr>
 EOT
-	done << EOT
-$projects
-EOT
+	done
 	cat << EOT
 		</table>
 	</div>
@@ -216,8 +74,7 @@ EOT
 
 html_select_members() {
 	edit_member="$1"
-	members="$(sqlite3 $db 'SELECT id,name FROM members ORDER BY name ASC')"
-	while read member
+	sqlite3 $db 'SELECT id,name FROM members ORDER BY name ASC' | while read member
 	do
 		mem_id="$(echo $member | cut -d '|' -f 1 )"
 		mem_name="$(echo $member | cut -d '|' -f 2)"
@@ -226,16 +83,12 @@ html_select_members() {
 		else
 			echo "<option value=$mem_id>$mem_name</option>"
 		fi
-	done << EOT
-$members
-EOT
-
+	done
 }
 
 html_select_categories() {
 	edit_category="$1"
-	categories="$(sqlite3 $db 'SELECT * FROM categories')"
-	while read category
+	sqlite3 $db 'SELECT * FROM categories' | while read category
 	do
 		cat_id="$(echo $category | cut -d '|' -f 1)"
 		cat_name="$(echo $category | cut -d '|' -f 2)"
@@ -244,23 +97,7 @@ html_select_categories() {
 		else
 			echo "<option value=$cat_id>$cat_name</option>"
 		fi
-	done << EOT
-$categories
-EOT
-}
-
-html_footer() {
-	cat << EOT
-			</div>
-		</div>
-		<div id="footer">
-			<p>System og design af <a href="http://necrophcodr.github.io">Steffen Rytter Postas</a>
-			Copyright &copy; $(date +%Y) <a href="http://www.middelfart.tv">Middelfart Lokal TV</a></p>
-			<small>MLTV-DB revision: <a href="${script_url}/info/${script_rev}">${script_rev}</a></small>
-		</div>
-	</body>
-</html>
-EOT
+	done
 }
 
 btn_del() {
@@ -335,10 +172,10 @@ case " $(POST) " in
 			exit 0
 		else
 			header
-			html_header
-			html_dashboard
+			html_tmpl 'header'
+			html_tmpl 'dashboard'
 			html_display_error
-			html_footer
+			html_tmpl 'footer'
 			exit 0
 		fi
 		;;
@@ -366,10 +203,10 @@ case " $(POST) " in
 		[ "$err" == "0" ] && header "$redir"
 		header
 		TITLE="$TITLE - SQL Fejl!"
-		html_header
-		html_dashboard
+		html_tmpl 'header'
+		html_tmpl 'dashboard'
 		html_display_error
-		html_footer
+		html_tmpl 'footer'
 		exit 0
 		;;
 esac
@@ -390,8 +227,8 @@ case " $(GET) " in
 			fi
 			header
 			cat << EOT
-$(html_header)
-$(html_dashboard)
+$(html_tmpl 'header')
+$(html_tmpl 'dashboard')
 <form action="${script}" method="post">
 	<input type="hidden" name="save" value="member" />
 	<input type="hidden" name="memid" value="$member" />
@@ -413,7 +250,7 @@ $(html_dashboard)
 	</table>
 	<input type="submit" value="Gem" />
 </form>
-$(html_footer)
+$(html_tmpl 'footer')
 EOT
 			exit 0
 		elif [ -z "$proj" ]; then
@@ -434,8 +271,8 @@ EOT
 			proj_participants=$(sqlite3 $db "SELECT participants FROM projects WHERE id == $proj")
 		fi
 		header
-		html_header
-		html_dashboard
+		html_tmpl 'header'
+		html_tmpl 'dashboard'
 		cat << EOT
 		<form method="post" action="${script}">
 			<input type="hidden" name="save" value="project"/>
@@ -510,7 +347,7 @@ EOT
 			<input type="submit" value="Gem" />
 		</form>
 EOT
-		html_footer
+		html_tmpl 'footer'
 		exit 0
 		;;
 	*\ delete\ *)
@@ -537,9 +374,9 @@ EOT
 			exit 0
 		fi
 		header
+		html_tmpl 'header'
+		html_tmpl 'dashboard'
 		cat << EOT
-$(html_header)
-$(html_dashboard)
 	<h3>$msg</h3>
 	<p><b>ADVARSEL</b>: Følgende handling kan ikke fortrydes, uden system administratorens ekspertise!</p>
 	<form action="${script}" method="post">
@@ -547,16 +384,16 @@ $(html_dashboard)
 		$html
 		<input type="submit" value="Slet" />
 	</form>
-$(html_footer)
 EOT
+		html_tmpl 'footer'
 		;;
 	*\ category\ *)
 		header
 		TITLE="$TITLE - Vis kategorier"
-		html_header
-		html_dashboard
+		html_tmpl 'header'
+		html_tmpl 'dashboard'
 		LFS="|"
-		for cat in $(sqlite3 $db "SELECT id FROM categories")
+		sqlite3 $db "SELECT id FROM categories" | while read cat
 		do
 			cat_name=$(sqlite3 $db "SELECT name FROM categories WHERE id == $cat")
 			cat << EOT
@@ -571,17 +408,17 @@ EOT
 	<input type="text" name="category" placeholder="Ny" />
 	<input type="submit" value="Opret" />
 EOT
-		html_footer
+		html_tmpl 'footer'
 		exit 0
 		;;
 	*\ member\ *)
 		member=$(GET id)
 		if [ -z "$member" ]; then
-			members=$(sqlite3 $db "SELECT * FROM members ORDER BY name ASC;")
+			# We're displaying all members
 			TITLE="$TITLE - Vis medlemmer"
 			header
-			html_header
-			html_dashboard
+			html_tmpl 'header'
+			html_tmpl 'dashboard'
 			cat << EOT
 <div id="sidebar">
 	<a href="${script}?member&amp;edit&amp;memid=0">Tilføj medlem</a>
@@ -599,7 +436,7 @@ EOT
 	</thead>
 	<tbody>
 EOT
-			while read member
+			sqlite3 $db "SELECT id,name,phone,email FROM members ORDER BY name ASC;" | while read member
 			do
 				member_id=$(echo $member | cut -d '|' -f 1)
 				member_name=$(echo $member | cut -d '|' -f 2)
@@ -615,14 +452,12 @@ EOT
 					<td><a href="${script}?member&amp;id=$member_id">$produced</a></td>
 				</tr>
 EOT
-			done << EOT
-$members
-EOT
+			done
 			cat << EOT
 			</tbody>
 		</table>
 EOT
-			html_footer
+			html_tmpl 'footer'
 		else
 			member_name=$(sqlite3 $db "SELECT name FROM members WHERE id == $member")
 			member_phone=$(sqlite3 $db "SELECT phone FROM members WHERE id == $member")
@@ -631,8 +466,8 @@ EOT
 
 			TITLE="$TITLE - Medlem: $member_name ($member)"
 			header
-			html_header
-			html_dashboard
+			html_tmpl 'header'
+			html_tmpl 'dashboard'
 			cat << EOT
 <div id="sidebar">
 	<a href="${script}?edit&amp;memid=$member">Redigér</a><br />
@@ -670,15 +505,15 @@ EOT
 	</tbody>
 </table>
 EOT
-			html_footer
+			html_tmpl 'footer'
 		fi
 		;;
 	*\ view\ *)
 		proj="$(GET p)"
 		TITLE="$TITLE - Database: Vis ${proj}"
 		header
-		html_header
-		html_dashboard
+		html_tmpl 'header'
+		html_tmpl 'dashboard'
 
 		proj_title=$(sqlite3 $db "SELECT title FROM projects WHERE id == $proj;")
 		proj_desc=$(sqlite3 $db "SELECT desc FROM projects WHERE id == $proj")
@@ -726,12 +561,10 @@ EOT
 			<tr>
 				<td><b>Beskrivelse</b>:
 EOT
-		while read desc
+		echo "${proj_desc}" | while read desc
 		do
-			echo "$desc<br/>"
-		done << EOT
-$proj_desc
-EOT
+			echo "${desc}<br/>"
+		done
 		cat << EOT
 				</td>
 				<td></td>
@@ -750,17 +583,17 @@ EOT
 		</table>
 EOT
 
-		html_footer
+		html_tmpl 'footer'
 		exit 0
 		;;
 	*\ search\ *)
 		terms="$(GET search)"
 		TITLE="$TITLE - Søg: $terms"
 		header
-		html_header
-		html_dashboard
+		html_tmpl 'header'
+		html_tmpl 'dashboard'
 
-		sqlite3 $db "SELECT id,title FROM projects WHERE id LIKE $terms OR title LIKE $terms OR desc LIKE $terms OR music LIKE $terms OR participants LIKE $terms"| while read result
+		sqlite3 $db "SELECT id,title FROM projects WHERE id LIKE $terms OR title LIKE $terms OR desc LIKE $terms OR music LIKE $terms OR participants LIKE $terms" | while read result
 		do
 			result_id="$(echo $result | cut -d '|' -f 1)"
 			result_title="$(echo $result | cut -d '|' -f 2)"
@@ -768,7 +601,7 @@ EOT
 			<a href="${script}?view&amp;p=$result_id">$result_id - $result_title</a>
 EOT
 		done
-		html_footer
+		html_tmpl 'footer'
 		;;
 	*\ browse\ *)
 		category="$(GET cat)"
@@ -789,15 +622,17 @@ EOT
 			nextid=$minid
 		fi
 		if [ -n "${category}" ]; then
+			# User wants to see projects in $category
 			projects=$(sqlite3 $db "SELECT id,title FROM projects WHERE id <= $startid AND category == $category ORDER BY id DESC LIMIT $LIMIT")
 			TITLE="$TITLE - Database: Gennemse $category"
 		else
+			# User wants to see ALL projects
 			projects=$(sqlite3 $db "SELECT id,title FROM projects WHERE id <= $startid ORDER BY id DESC LIMIT $LIMIT")
 			TITLE="$TITLE - Database: Gennemse alle"
 		fi
 		header
-		html_header
-		html_dashboard
+		html_tmpl 'header'
+		html_tmpl 'dashboard'
 		categories=$(sqlite3 $db "SELECT * FROM categories")
 		if [ -n "${categories}" ]; then
 			echo "<div id='sidebar'>"
@@ -845,15 +680,14 @@ EOT
 	</table>
 		<a href="${script}?browse&amp;startid=$nextid">Ældre</a> | <a href="${script}?browse&amp;startid=$previd">Nyere</a>
 EOT
-		html_footer
+		html_tmpl 'footer'
 		;;
 	*)
 		# "Dashboard" screen
 		TITLE="$TITLE - Database"
-		projects=$(sqlite3 $db "SELECT id,title FROM projects ORDER BY id DESC LIMIT 15")
 		header
-		html_header
-		html_dashboard
+		html_tmpl 'header'
+		html_tmpl 'dashboard'
 		html_sidebar $projects
 		cat << EOT
 		<h2>Velkommen til Middelfart Lokal TV Projekt Databasen.</h2>
@@ -866,6 +700,6 @@ EOT
 		Du kan gennemse alle projekter ved at klikke på "<a href="${script}?browse">Gennemse projekter</a>" øverst, og ønsker du at søge, kan du blot skrive i søgefeltet og trykke <code>ENTER</code>, for at søge på projektnumre, beskrivelser, titler, og alt andet information.
 		</p>
 EOT
-		html_footer
+		html_tmpl 'footer'
 		;;	
 esac
