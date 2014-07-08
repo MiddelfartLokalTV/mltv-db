@@ -1,0 +1,49 @@
+@import url(http://fonts.googleapis.com/css?family=Fira+Sans:300);
+body {
+	font-family: 'Fira Sans', sans-serif;
+	background-color: #ddd;
+	margin: 0;
+	padding: 0;
+}
+ul {
+	display: inline;
+	margin: 0;
+	padding: 0;
+}
+a {
+	color: #005;
+	text-decoration: none;
+}
+a:hover {
+	color: #00b;
+}
+#wrapper {
+	background-color: #fff;
+	border-bottom: 0.1em solid #55f;
+}
+#content {
+	padding: 1em;
+	min-height: 30em;
+}
+#dashboard {
+	border-bottom: 0.1em solid #55f;
+	padding-bottom: 0.2em;
+}
+.dashbtn {
+	background: #fafafa;
+	display: inline;
+	padding: 0.2em;
+		padding-top: 0;
+}
+.dashbtn:hover {
+	border-bottom: 0.1em solid #00cc10;
+	background: #f5f5f5;
+}
+#dashboard > li > a {
+	padding: 0.2em;
+	padding-top: 0;
+}
+#dashboard form {
+	float: right;
+	display: inline;
+}
