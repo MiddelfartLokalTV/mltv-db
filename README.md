@@ -10,6 +10,6 @@ To use the new style, change the variable STYLE in the index.cgi file (in the be
 Installation instructions, usage, etc is listed below:
   
  * [Installing](doc/install.md)
-  
+ * [Styling](doc/styling.md)
   
 For more information you can read the rest of the documentation in the [/doc](/tree?ci=trunk&name=doc) directory.
