@@ -9,7 +9,7 @@ To create a new style, simply create a new directory in the styles path, and cop
 To use the new style, change the variable STYLE in the index.cgi file (in the beginning of the file) to the name of your style directory, no leading or trailing slashes.  
 Installation instructions, usage, etc is listed below:
   
- * [Installing](/doc/trunk/doc/install.md)
+ * [Installing](doc/install.md)
   
   
 For more information you can read the rest of the documentation in the [/doc](/tree?ci=trunk&name=doc) directory.
