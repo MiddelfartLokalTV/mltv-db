@@ -20,8 +20,8 @@ However, that's not all there is to the styles, and further explanation may be n
 It is important to note that these CGI scripts are sourced DIRECTLY by the index.cgi script, and as such, all variables present in the index.cgi script will be available to the templates.  
 This includes, but is not limited to, 
 
- * $styles, the complete physical path to the styles directory.
- * $STYLE, the name of the current style.
- * $path, the complete URI path to the index.cgi file. You can use ${path}/styles/${STYLE}/ to access files from the current style, for external style-specific resources like javascript or css files.
- * $script, the name and full URI of the current script being executed by the shell. This is typically index.cgi. Note that any subshells spawned from index.cgi will not change this variable.
+ * $styles, the complete physical path to the styles directory. (ie: /var/www/mltv/styles)
+ * $STYLE, the name of the current style. (ie: `the style`)
+ * $path, the complete URI path to the index.cgi file. You can use ${path}/styles/${STYLE}/ to access files from the current style, for external style-specific resources like javascript or css files. (ie: http://`your_site`/mltv/)
+ * $script, the name and full URI of the current script being executed by the shell. This is typically index.cgi. Note that any subshells spawned from index.cgi will not change this variable. (ie: ${path}/index.cgi)
   
