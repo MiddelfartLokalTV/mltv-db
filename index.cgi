@@ -694,7 +694,7 @@ EOT
 		<p>
 		Her kan du oprette og se projekter, og slette eksisterende.
 		<br />
-		Klik blot "<a href="${script}?create">Opret projekt</a>", og du er igang.
+		Klik blot "<a href="${script}?edit">Opret projekt</a>", og du er igang.
 		</p>
 		<p>
 		Du kan gennemse alle projekter ved at klikke på "<a href="${script}?browse">Gennemse projekter</a>" øverst, og ønsker du at søge, kan du blot skrive i søgefeltet og trykke <code>ENTER</code>, for at søge på projektnumre, beskrivelser, titler, og alt andet information.
