@@ -226,9 +226,9 @@ case " $(GET) " in
 				TITLE="$TITLE - Redigér medlem: $member_name ($member)"
 			fi
 			header
+			html_tmpl 'header'
+			html_tmpl 'dashboard'
 			cat << EOT
-$(html_tmpl 'header')
-$(html_tmpl 'dashboard')
 <form action="${script}" method="post">
 	<input type="hidden" name="save" value="member" />
 	<input type="hidden" name="memid" value="$member" />
@@ -250,8 +250,8 @@ $(html_tmpl 'dashboard')
 	</table>
 	<input type="submit" value="Gem" />
 </form>
-$(html_tmpl 'footer')
 EOT
+			html_tmpl 'footer'
 			exit 0
 		elif [ -z "$proj" ]; then
 			TITLE="Database: Opret projekt"
