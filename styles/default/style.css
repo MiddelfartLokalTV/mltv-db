@@ -1,3 +1,12 @@
+/*
+ * Design Copyright Steffen Rytter Postas 2014
+ *
+ * Regarding the font issue, it seems that according to issue item 137692 on the Chromium issue tracker
+ * ( https://code.google.com/p/chromium/issues/detail?id=137692 ),
+ * that the fix for font rendering on Chrome for Windows is aiming for release on M37.
+ * When this release is out, please check if the issue has been fixed.
+ */
+
 /* @import url(http://fonts.googleapis.com/css?family=Fira+Sans:300); */
 body {
 /*	font-family: 'Fira Sans', sans-serif; */
