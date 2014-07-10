@@ -156,6 +156,10 @@ case " $(POST) " in
 				[ -z "$p" ] && p=NULL
 				sql="INSERT INTO projects VALUES ( $p, \"$title\", \"$desc\", $producer, $editor, $category, \"$music\", \"$created\", \"$exp_done\", \"$exp_length\", \"$real_length\", \"$release\", \"$participants\" );"
 				redir="Location: ${script}?browse"
+			elif [ -z "$(sqlite3 $db 'SELECT id FROM projects WHERE id == $p')" ]; then
+				# We're creating a new project with id $p
+				sql="INSERT INTO projects VALUES ( $p, \"$title\", \"$desc\", $producer, $editor, $category, \"$music\", \"$created\", \"$exp_done\", \"$exp_length\", \"$real_length\", \"$release\", \"$participants\" );"
+				redir="Location: ${script}?browse"
 			else
 				# We're updating an existing project
 				sql="UPDATE projects SET title = \"$title\", desc = \"$desc\", producer = $producer, editor = $editor, category = $category, music = \"$music\", created = \"$created\", expected_done = \"$exp_done\", expected_length = \"$exp_length\", real_length = \"$real_length\", release = \"$release\", participants = \"$participants\" WHERE id == $p;"
