@@ -13,7 +13,7 @@ cat << EOT
 		<div class="clear"></div>
 		<div id="content">
 			<div id="header">
-				<a href="${script}"><img id="logo" src="logo_traced.png" /></a>
+				<a href="${script}"><img id="logo" src="logo.gif" /></a>
 				$([ -n "$(GET view)" ] && [ -n "$(GET p)" ] && echo '<h2>Arbejdskort</h2>')
 			</div>
 			<br />
