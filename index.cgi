@@ -100,18 +100,6 @@ html_select_categories() {
 	done
 }
 
-btn_del() {
-	name="$1"
-	value="$2"
-	cat << EOT
-<form style="display: inline;" action="${script}" method="get">
-	<input type="hidden" name="delete" />
-	<input type="hidden" name="$name" value="$value" />
-	<input type="submit" value="×" />
-</form>
-EOT
-}
-
 # ====
 # Routing
 # ====
@@ -196,10 +184,6 @@ case " $(POST) " in
 			member=$(POST memid)
 			sql="DELETE FROM members WHERE id == $member"
 			redir="Location: ${script}?member"
-		elif [ "$(POST delete)" == "project" ]; then
-			p=$(POST p)
-			sql="DELETE FROM projects WHERE id == $p"
-			redir="Location: ${script}?browse"
 		else
 			header "Location: $HTTP_REFERER"
 			exit 0
@@ -360,12 +344,7 @@ EOT
 		p="$(GET p)"
 		member="$(GET memid)"
 		cat="$(GET cat)"
-		if [ -n "$p" ]; then
-			msg="Er du sikker på du vil slette projekt $p?"
-			val="project"
-			html="<input type='hidden' name='p' value=\"${p}\" />"
-			TITLE="$TITLE - Slet projekt $p?"
-		elif [ -n "$member" ]; then
+		if [ -n "$member" ]; then
 			msg="Er du sikker på du vil slette medlem: $member?"
 			val="member"
 			html="<input type='hidden' name='memid' value=\"${member}\" />"
@@ -551,8 +530,6 @@ EOT
 		cat << EOT
 		<div id="sidebar">
 			<a href="${script}?edit&amp;p=$proj">Redigér</a>
-			<br />
-			<a href="${script}?delete&amp;p=$proj">Slet</a>
 		</div>
 		<h3>$proj &nbsp; - &nbsp; $proj_title</h3>
 		<table id="project-view">
@@ -658,7 +635,6 @@ EOT
 	<table>
 		<thead>
 			<tr>
-				<th></th>
 				<th>Projekt nr.</th>
 				<th>Projekt titel</th>
 			</tr>
@@ -671,9 +647,6 @@ EOT
 			proj_title="$(echo $proj | cut -d '|' -f 2)"
 			cat << EOT
 			<tr>
-				<td>
-					$(btn_del "p" "$proj_id")
-					</td>
 				<td><a href="${script}?view&amp;p=$proj_id">${proj_id}</a></td>
 				<td><a href="${script}?view&amp;p=$proj_id">${proj_title}</a></td>
 			</tr>
