@@ -264,6 +264,9 @@ EOT
 		html_tmpl 'header'
 		html_tmpl 'dashboard'
 		cat << EOT
+		<div id="sidebar">
+			<a href="javascript:projectSave();">Gem</a>
+		</div>
 		<form method="post" action="${script}">
 			<input type="hidden" name="save" value="project"/>
 			<table>
@@ -274,7 +277,17 @@ EOT
 					</tr>
 					<tr>
 						<td>Projekt Nummer:</td>
+EOT
+		if [[ -z "$proj" ]]; then
+			cat << EOT
+			<td><input type="text" name="p" placeholder="nyt" disabled="disabled" /> <i>(projekt nummer tildeles efter oprettelse)</i></td>
+EOT
+		else
+			cat << EOT
 						<td><input type="text" name="p" placeholder="(nyt)" value="$proj" /></td>
+EOT
+		fi
+		cat << EOT
 					</tr>
 					<tr>
 						<td>Producer:</td>
@@ -334,7 +347,6 @@ EOT
 					</tr>
 				</tbody>
 			</table>
-			<input type="submit" value="Gem" />
 		</form>
 EOT
 		html_tmpl 'footer'
