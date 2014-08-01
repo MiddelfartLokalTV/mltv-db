@@ -80,6 +80,6 @@ a:hover {
 		border-collapse: collapse;
 	}
 	td {
-		padding: 1em;
+		padding-left: 1em;
 	}
 }
