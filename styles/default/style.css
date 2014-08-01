@@ -73,6 +73,9 @@ a:hover {
 	#sidebar, #dashboard, #footer {
 		display: none;
 	}
+	#wrapper {
+		border: 0;
+	}
 	table {
 		border-collapse: collapse;
 	}
