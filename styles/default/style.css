@@ -70,6 +70,10 @@ a:hover {
 	body {
 		background: #fff;
 	}
+	#content {
+		padding: 0;
+		padding-top: 1em;
+	}
 	#sidebar, #dashboard, #footer {
 		display: none;
 	}
@@ -80,6 +84,6 @@ a:hover {
 		border-collapse: collapse;
 	}
 	td {
-		padding-left: 1em;
+		padding-left: 0.5em;
 	}
 }
