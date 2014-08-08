@@ -69,6 +69,7 @@ a:hover {
 @media print {
 	body {
 		background: #fff;
+		font-size: 0.8em;
 	}
 	#content {
 		padding: 0;
