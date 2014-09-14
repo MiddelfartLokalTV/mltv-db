@@ -587,15 +587,25 @@ EOT
 		header
 		html_tmpl 'header'
 		html_tmpl 'dashboard'
+		cat << EOT
+		<table>
+EOT
 
-		sqlite3 $db "SELECT id,title FROM projects WHERE id LIKE $terms OR title LIKE $terms OR desc LIKE $terms OR music LIKE $terms OR participants LIKE $terms" | while read result
+		sqlite3 $db "SELECT id,title FROM projects WHERE id LIKE \"%$terms%\" OR title LIKE \"%$terms%\" OR desc LIKE \"%$terms%\" OR music LIKE \"%$terms%\" OR participants LIKE \"%$terms%\" ORDER BY id DESC" | while read result
 		do
 			result_id="$(echo $result | cut -d '|' -f 1)"
 			result_title="$(echo $result | cut -d '|' -f 2)"
 			cat << EOT
-			<a href="${script}?view&amp;p=$result_id">$result_id - $result_title</a>
+			<tr>
+				<td><a href="${script}?view&amp;p=$result_id">$result_id</a></td>
+				<td><a href="${script}?view&amp;p=$result_id">$result_title</a></td>
+			</tr>
+
 EOT
 		done
+		cat << EOT
+	</table>
+EOT
 		html_tmpl 'footer'
 		;;
 	*\ browse\ *)
