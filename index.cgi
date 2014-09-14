@@ -265,7 +265,7 @@ EOT
 		html_tmpl 'dashboard'
 		cat << EOT
 		<div id="sidebar">
-			<a href="javascript:projectSave();">Gem</a>
+		<a href="#" onClick="projectSave();">Gem</a>
 		</div>
 		<form method="post" action="${script}">
 			<input type="hidden" name="save" value="project"/>
@@ -347,6 +347,7 @@ EOT
 					</tr>
 				</tbody>
 			</table>
+			<input type="submit" name="submit" style="display: none;" />
 		</form>
 EOT
 		html_tmpl 'footer'
@@ -581,33 +582,6 @@ EOT
 		html_tmpl 'footer'
 		exit 0
 		;;
-	*\ search\ *)
-		terms="$(GET search)"
-		TITLE="$TITLE - Søg: $terms"
-		header
-		html_tmpl 'header'
-		html_tmpl 'dashboard'
-		cat << EOT
-		<table>
-EOT
-
-		sqlite3 $db "SELECT id,title FROM projects WHERE id LIKE \"%$terms%\" OR title LIKE \"%$terms%\" OR desc LIKE \"%$terms%\" OR music LIKE \"%$terms%\" OR participants LIKE \"%$terms%\" ORDER BY id DESC" | while read result
-		do
-			result_id="$(echo $result | cut -d '|' -f 1)"
-			result_title="$(echo $result | cut -d '|' -f 2)"
-			cat << EOT
-			<tr>
-				<td><a href="${script}?view&amp;p=$result_id">$result_id</a></td>
-				<td><a href="${script}?view&amp;p=$result_id">$result_title</a></td>
-			</tr>
-
-EOT
-		done
-		cat << EOT
-	</table>
-EOT
-		html_tmpl 'footer'
-		;;
 	*\ browse\ *)
 		category="$(GET cat)"
 		startid="$(GET startid)"
@@ -683,6 +657,34 @@ EOT
 EOT
 		html_tmpl 'footer'
 		;;
+	*\ search\ *)
+		terms="$(GET search)"
+		TITLE="$TITLE - Søg: $terms"
+		header
+		html_tmpl 'header'
+		html_tmpl 'dashboard'
+		cat << EOT
+		<table>
+EOT
+
+		sqlite3 $db "SELECT id,title FROM projects WHERE id LIKE \"%$terms%\" OR title LIKE \"%$terms%\" OR desc LIKE \"%$terms%\" OR music LIKE \"%$terms%\" OR participants LIKE \"%$terms%\" ORDER BY id DESC" | while read result
+		do
+			result_id="$(echo $result | cut -d '|' -f 1)"
+			result_title="$(echo $result | cut -d '|' -f 2)"
+			cat << EOT
+			<tr>
+				<td><a href="${script}?view&amp;p=$result_id">$result_id</a></td>
+				<td><a href="${script}?view&amp;p=$result_id">$result_title</a></td>
+			</tr>
+
+EOT
+		done
+		cat << EOT
+	</table>
+EOT
+		html_tmpl 'footer'
+		;;
+
 	*)
 		# "Dashboard" screen
 		TITLE="$TITLE - Database"

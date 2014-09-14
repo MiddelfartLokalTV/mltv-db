@@ -10,7 +10,7 @@ cat << EOT
 		<script src="zepto.min.js"></script>
 		<script>
 		function projectSave() {
-			\$("form").submit();
+			document.getElementsByTagName("form")[1].submit.click();
 		}
 		</script>
 	</body>
