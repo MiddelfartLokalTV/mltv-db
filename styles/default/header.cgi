@@ -3,7 +3,7 @@ cat << EOT
 <!doctype html>
 <html>
 	<head>
-		<meta charset="utf8">
+		<meta charset="utf-8">
 		<link rel="icon" type="image/png"
 			href="logo_traced.png" />
 		<title>$TITLE</title>

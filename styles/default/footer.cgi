@@ -7,10 +7,10 @@ cat << EOT
 			Copyright &copy; $(date +%Y) <a href="http://www.middelfart.tv">Middelfart Lokal TV</a></p>
 			<small><a href="${script_url}">MLTV-DB</a> revision: <a href="${script_url}/info/${script_rev}">${script_rev}</a></small>
 		</div>
-		<script src="jquery-2.1.1.min.js"></script>
+		<script src="zepto.min.js"></script>
 		<script>
 		function projectSave() {
-			\$("form").submit();
+			document.getElementsByTagName("form")[1].submit.click();
 		}
 		</script>
 	</body>
