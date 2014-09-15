@@ -23,6 +23,10 @@ script_rev=$(sqlite3 .repo.fossil "SELECT uuid FROM blob WHERE rid == $script_la
 STYLE="default"
 DEBUG=yes
 
+sanitize() {
+	sed -e 's|\&|\&amp;|g; s|<|\&lt;|g; s|>|\&gt;|g; s|"|\&quot;|g'
+}
+
 # ====
 # Functions
 # ====
@@ -111,10 +115,11 @@ case " $(POST) " in
 			category="$(POST category)"
 			sql="INSERT INTO categories VALUES( NULL, \"$category\");"
 			redir="Location: ${script}?category"
+			exit 0
 		elif [ "$(POST save)" == "member" ]; then
-			name="$(POST name)"
-			phone="$(POST phone)"
-			email="$(POST email)"
+			name="$(POST name | sanitize)"
+			phone="$(POST phone | sanitize)"
+			email="$(POST email | sanitize)"
 			memid="$(POST memid)"
 			if [ "$memid" == "NULL" ]; then
 				# We're adding a new member
@@ -125,20 +130,21 @@ case " $(POST) " in
 				sql="UPDATE members SET name=\"$name\", phone=\"$phone\", email=\"$email\" WHERE id == $memid"
 				redir="Location: ${script}?member&id=$memid"
 			fi
+			exit 0
 		elif [ "$(POST save)" == "project" ]; then
-			title="$(POST title)"
-			desc="$(POST desc)"
+			title="$(POST title | sanitize)"
+			desc="$(POST desc | sanitize)"
 			p="$(POST p)"
 			producer="$(POST producer)"
 			editor="$(POST editor)"
 			category=$(POST category)
-			music="$(POST music)"
-			created="$(POST created)"
-			exp_done="$(POST exp_done)"
-			exp_length="$(POST exp_length)"
-			real_length="$(POST real_length)"
-			release="$(POST release)"
-			participants="$(POST participants)"
+			music="$(POST music | sanitize)"
+			created="$(POST created | sanitize)"
+			exp_done="$(POST exp_done | sanitize)"
+			exp_length="$(POST exp_length | sanitize)"
+			real_length="$(POST real_length | sanitize)"
+			release="$(POST release | sanitize)"
+			participants="$(POST participants | sanitize)"
 			if [ -z "$p" ]; then
 				# We're creating a new project
 				[ -z "$p" ] && p=NULL
@@ -146,15 +152,19 @@ case " $(POST) " in
 				realp=$(sqlite3 $db "SELECT MAX(id) FROM projects")
 				realp=$(($realp + 1 ))
 				redir="Location: ${script}?view&p=$realp"
+				exit 0
 			elif [ -z "$(sqlite3 $db 'SELECT id FROM projects WHERE id == '$p)" ]; then
 				# We're creating a new project with id $p
 				sql="INSERT INTO projects VALUES ( $p, \"$title\", \"$desc\", $producer, $editor, $category, \"$music\", \"$created\", \"$exp_done\", \"$exp_length\", \"$real_length\", \"$release\", \"$participants\" );"
 				redir="Location: ${script}?view&p=$p"
+				exit 0
 			else
 				# We're updating an existing project
 				sql="UPDATE projects SET title = \"$title\", desc = \"$desc\", producer = $producer, editor = $editor, category = $category, music = \"$music\", created = \"$created\", expected_done = \"$exp_done\", expected_length = \"$exp_length\", real_length = \"$real_length\", release = \"$release\", participants = \"$participants\" WHERE id == $p;"
 				redir="Location: ${script}?view&p=$p"
+				exit 0
 			fi
+			exit 0
 		else
 			header "Location: $HTTP_REFERER"
 			exit 0
