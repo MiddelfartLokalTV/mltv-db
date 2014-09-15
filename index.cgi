@@ -23,15 +23,17 @@ script_rev=$(sqlite3 .repo.fossil "SELECT uuid FROM blob WHERE rid == $script_la
 STYLE="default"
 DEBUG=yes
 
-sanitize() {
-	sed -e 's|\&|\&amp;|g; s|<|\&lt;|g; s|>|\&gt;|g; s|"|\&quot;|g'
-}
+# Ensure database exists.
+[ ! -f "$db" ] && cat schema | sqlite3 $db
 
 # ====
 # Functions
 # ====
 
-[ ! -f "$db" ] && cat schema | sqlite3 $db
+# Ensure that problematic inserts doesn't exist.
+sanitize() {
+	sed -e 's|\&|\&amp;|g; s|<|\&lt;|g; s|>|\&gt;|g; s|\"|\&quot;|g'
+}
 
 html_tmpl() {
 	tmpl="$1"
@@ -115,7 +117,6 @@ case " $(POST) " in
 			category="$(POST category)"
 			sql="INSERT INTO categories VALUES( NULL, \"$category\");"
 			redir="Location: ${script}?category"
-			exit 0
 		elif [ "$(POST save)" == "member" ]; then
 			name="$(POST name | sanitize)"
 			phone="$(POST phone | sanitize)"
@@ -130,7 +131,6 @@ case " $(POST) " in
 				sql="UPDATE members SET name=\"$name\", phone=\"$phone\", email=\"$email\" WHERE id == $memid"
 				redir="Location: ${script}?member&id=$memid"
 			fi
-			exit 0
 		elif [ "$(POST save)" == "project" ]; then
 			title="$(POST title | sanitize)"
 			desc="$(POST desc | sanitize)"
@@ -152,19 +152,15 @@ case " $(POST) " in
 				realp=$(sqlite3 $db "SELECT MAX(id) FROM projects")
 				realp=$(($realp + 1 ))
 				redir="Location: ${script}?view&p=$realp"
-				exit 0
 			elif [ -z "$(sqlite3 $db 'SELECT id FROM projects WHERE id == '$p)" ]; then
 				# We're creating a new project with id $p
 				sql="INSERT INTO projects VALUES ( $p, \"$title\", \"$desc\", $producer, $editor, $category, \"$music\", \"$created\", \"$exp_done\", \"$exp_length\", \"$real_length\", \"$release\", \"$participants\" );"
 				redir="Location: ${script}?view&p=$p"
-				exit 0
 			else
 				# We're updating an existing project
 				sql="UPDATE projects SET title = \"$title\", desc = \"$desc\", producer = $producer, editor = $editor, category = $category, music = \"$music\", created = \"$created\", expected_done = \"$exp_done\", expected_length = \"$exp_length\", real_length = \"$real_length\", release = \"$release\", participants = \"$participants\" WHERE id == $p;"
 				redir="Location: ${script}?view&p=$p"
-				exit 0
 			fi
-			exit 0
 		else
 			header "Location: $HTTP_REFERER"
 			exit 0
