@@ -115,7 +115,6 @@ case " $(POST) " in
 			category="$(POST category)"
 			sql="INSERT INTO categories VALUES( NULL, \"$category\");"
 			redir="Location: ${script}?category"
-			exit 0
 		elif [ "$(POST save)" == "member" ]; then
 			name="$(POST name | sanitize)"
 			phone="$(POST phone | sanitize)"
@@ -130,7 +129,6 @@ case " $(POST) " in
 				sql="UPDATE members SET name=\"$name\", phone=\"$phone\", email=\"$email\" WHERE id == $memid"
 				redir="Location: ${script}?member&id=$memid"
 			fi
-			exit 0
 		elif [ "$(POST save)" == "project" ]; then
 			title="$(POST title | sanitize)"
 			desc="$(POST desc | sanitize)"
