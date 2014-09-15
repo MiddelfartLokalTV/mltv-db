@@ -23,15 +23,17 @@ script_rev=$(sqlite3 .repo.fossil "SELECT uuid FROM blob WHERE rid == $script_la
 STYLE="default"
 DEBUG=yes
 
-sanitize() {
-	sed -e 's|\&|\&amp;|g; s|<|\&lt;|g; s|>|\&gt;|g; s|"|\&quot;|g'
-}
+# Ensure database exists.
+[ ! -f "$db" ] && cat schema | sqlite3 $db
 
 # ====
 # Functions
 # ====
 
-[ ! -f "$db" ] && cat schema | sqlite3 $db
+# Ensure that problematic inserts doesn't exist.
+sanitize() {
+	sed -e 's|\&|\&amp;|g; s|<|\&lt;|g; s|>|\&gt;|g; s|\"|\&quot;|g'
+}
 
 html_tmpl() {
 	tmpl="$1"
