@@ -426,7 +426,10 @@ EOT
 		proj_exp_done=$(sqlite3 $db "SELECT expected_done FROM projects WHERE id == $proj")
 		proj_exp_length=$(sqlite3 $db "SELECT expected_length FROM projects WHERE id == $proj")
 		proj_real_length=$(sqlite3 $db "SELECT real_length FROM projects WHERE id == $proj")
+		proj_timespan=$(sqlite3 $db "SELECT timespan FROM projects WHERE id == $proj")
 		proj_release=$(sqlite3 $db "SELECT release FROM projects WHERE id == $proj")
+		proj_release_type=$(sqlite3 $db "SELECT release_type FROM projects WHERE id == $proj")
+		proj_release_type=$(sqlite3 $db "SELECT type FROM release_type WHERE id == $proj_release_type" )
 		proj_participants=$(sqlite3 $db "SELECT participants FROM projects WHERE id == $proj")
 
 		if [ -z "$proj_producer" ]; then
@@ -469,12 +472,16 @@ EOT
 				<td><b>Deltagere</b>: $proj_participants</td>
 			</tr>
 			<tr>
-				<td><b>Forventet færdig</b>: $proj_exp_done</td>
+				<td><b>iForventet færdig</b>: $proj_exp_done</td>
 				<td><b>Forventet længde</b>: $proj_exp_length</td>
 			</tr>
 			<tr>
 				<td><b>Udgivet</b>: $proj_release</td>
 				<td><b>Aktuel længde</b>: $proj_real_length</td>
+			</tr>
+			<tr>
+				<td><b>Tidsramme</b>: $proj_timespan</td>
+				<td><b>Udsendelsestype</b>: $proj_release_type</td>
 			</tr>
 		</table>
 EOT

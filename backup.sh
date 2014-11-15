@@ -16,8 +16,8 @@ check_bin() {
 check_bin zpaq
 
 # Initialize variables from index.cgi
-. index.cgi >/dev/null
-backup="/usr/lib/mltv"
+. ./index.cgi >/dev/null
+backup="$HOME/tmp/mltv"
 
 # Perform the actual backup
 mkdir -p "${backup}"

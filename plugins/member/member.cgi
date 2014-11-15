@@ -17,7 +17,6 @@ case " $(GET) " in
 <table>
 	<thead>
 		<tr>
-			<th></th>
 			<th><b>Navn</b></th>
 			<th><b>Telefon</b></th>
 			<th><b>E-Mail</b></th>
@@ -35,7 +34,6 @@ EOT
 				produced=$(sqlite3 $db "SELECT COUNT(id) FROM projects WHERE producer == $member_id")
 				cat << EOT
 				<tr>
-					<td>$(btn_del "memid" "$member_id")</td>
 					<td><a href="${script}?member&amp;memid=$member_id">$member_name</a></td>
 					<td>$member_phone</td>
 					<td><a href="mailto:$member_email">$member_email</a></td>
@@ -71,7 +69,6 @@ EOT
 <table>
 	<thead>
 		<tr>
-			<th></th>
 			<th>Projekt Nr.</th>
 			<th>Projekt Titel</th>
 		</tr>
@@ -84,9 +81,6 @@ EOT
 				project_title=$(sqlite3 $db "SELECT title FROM projects WHERE id == $proj")
 				cat << EOT
 		<tr>
-			<td>
-				$(btn_del "p" "$proj")
-			</td>
 			<td><a href="${script}?view&amp;p=$proj">$proj</a></td>
 			<td><a href="${script}?view&amp;p=$proj">$project_title</a></td>
 		</tr>

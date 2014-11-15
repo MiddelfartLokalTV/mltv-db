@@ -18,8 +18,7 @@ CREATE TABLE projects ( id INTEGER PRIMARY KEY,
 	timespan TEXT,
 	release DATE,
 	release_type INTEGER,
-	participants TEXT,
-	type INTEGER );
+	participants TEXT );
 
 /*
  * The categories table contains a category identifier 'id', and the name of the category.
@@ -38,3 +37,10 @@ CREATE TABLE members ( id INTEGER PRIMARY KEY,
 	phone TEXT,
 	email TEXT );
 
+CREATE TABLE release_type ( id INTEGER PRIMARY KEY,
+	type TEXT );
+
+INSERT OR IGNORE INTO release_type( 0, "Ikke udsendt" );
+INSERT OR IGNORE INTO release_type( 10, "Udsendt" );
+INSERT OR IGNORE INTO release_type( 20, "Genudsendt" );
+INSERT OR IGNORE INTO release_type( 30, "Yderlig genudsendt" );
