@@ -12,11 +12,14 @@ CREATE TABLE projects ( id INTEGER PRIMARY KEY,
 	category INTEGER,
 	music TEXT,
 	created TEXT,
-	expected_done TEXT,
-	expected_length TEXT,
-	real_length TEXT,
-	release TEXT,
-	participants TEXT );
+	expected_done DATE,
+	expected_length DATE,
+	real_length DATE,
+	timespan TEXT,
+	release DATE,
+	release_type INTEGER,
+	participants TEXT,
+	type INTEGER );
 
 /*
  * The categories table contains a category identifier 'id', and the name of the category.
