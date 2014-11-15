@@ -1,0 +1,90 @@
+/*
+ * Design Copyright Steffen Rytter Postas 2014
+ *
+ * Regarding the font issue, it seems that according to issue item 137692 on the Chromium issue tracker
+ * ( https://code.google.com/p/chromium/issues/detail?id=137692 ),
+ * that the fix for font rendering on Chrome for Windows is aiming for release on M37.
+ * When this release is out, please check if the issue has been fixed.
+ */
+
+/* @import url(http://fonts.googleapis.com/css?family=Fira+Sans:300); */
+body {
+/*	font-family: 'Fira Sans', sans-serif; */
+	font-family: sans-serif;
+	background-color: #ddd;
+	margin: 0;
+	padding: 0;
+}
+ul {
+	display: inline;
+	margin: 0;
+	padding: 0;
+}
+a {
+	color: #005;
+	text-decoration: none;
+}
+a:hover {
+	color: #00b;
+}
+#wrapper {
+	background-color: #fff;
+	border-bottom: 0.1em solid #55f;
+}
+#content {
+	padding: 1em;
+	min-height: 35em;
+}
+#dashboard {
+	border-bottom: 0.1em solid #55f;
+	padding-bottom: 0.2em;
+}
+.dashbtn {
+	background: #fafafa;
+	display: inline;
+	padding: 0.2em;
+		padding-top: 0;
+}
+.dashbtn:hover {
+	border-bottom: 0.1em solid #00cc10;
+	background: #f5f5f5;
+}
+#dashboard > li > a {
+	padding: 0.2em;
+	padding-top: 0;
+}
+#dashboard form {
+	float: right;
+	display: inline;
+}
+#sidebar {
+	float: right;
+	border: 0.1em solid #ddd;
+	box-shadow: 0 0.1em 0.1em #000;
+}
+#footer {
+	text-align: center;
+}
+
+@media print {
+	body {
+		background: #fff;
+		font-size: 0.8em;
+	}
+	#content {
+		padding: 0;
+		padding-top: 1em;
+	}
+	#sidebar, #dashboard, #footer {
+		display: none;
+	}
+	#wrapper {
+		border: 0;
+	}
+	table {
+		border-collapse: collapse;
+	}
+	td {
+		padding-left: 0.5em;
+	}
+}
