@@ -6,6 +6,7 @@ cat << EOT
 			<li class="dashbtn"><a href="${script}?category">Kategorier</a></li>
 			<li class="dashbtn"><a href="${script}?browse">Gennemse projekter</a></li>
 			<li class="dashbtn"><a href="${script}?edit">Opret projekt</a></li>
+			<li class="dashbtn"><a href="${script}?report">Opret Rapport</a></li>
 			<li class="dashbtn"><form method="get" action="${script}">
 				<input type="text" name="search" placeholder="Søg" />
 			</form></li>

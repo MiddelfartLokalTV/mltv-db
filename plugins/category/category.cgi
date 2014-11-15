@@ -11,7 +11,6 @@ case " $(GET) " in
 		do
 			cat_name=$(sqlite3 $db "SELECT name FROM categories WHERE id == $cat")
 			cat << EOT
-$(btn_del "cat" "$cat")
 <a href="${script}?browse&amp;cat=$cat">$cat_name</a>
 <br />
 EOT

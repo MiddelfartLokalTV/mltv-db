@@ -2,7 +2,7 @@
 #
 # MLTV Database Web Configuration
 #
-. /usr/lib/slitaz/httphelper
+. ./httphelper.cgi
 
 TITLE="MLTV"
 
@@ -14,7 +14,7 @@ root="$(pwd)"
 styles="${root}/styles"
 script="${SCRIPT_NAME}"
 path="${script%/*}"
-db="/var/tmp/mltv.db"
+db="/tmp/mltv.db"
 script_url="https://chiselapp.com/user/mastersrp/repository/mltv-db"
 #script_url="http://${HTTP_HOST%:*}:8082"
 script_lastid=$(sqlite3 .repo.fossil "SELECT MAX(rid) FROM blob;")
@@ -25,8 +25,13 @@ DEBUG=yes
 PLUGINS="${root}/plugins"
 
 # Ensure database exists.
-[ ! -f "$db" ] && cat schema | sqlite3 $db
-
+if [ ! -f "$db" ]; then
+	if [ -f "/var/tmp/mltv.db" ]; then
+		sqlite3 /var/tmp/mltv.db .dump | sqlite3 $db
+	else
+		cat schema | sqlite3 $db
+	fi
+fi
 # ====
 # Functions
 # ====
@@ -46,11 +51,11 @@ html_tmpl() {
 html_display_error() {
 	cat << EOT
 	<h2>Kunne ikke fuldføre din anmodning!</h2>
-	<p>Følgende fejlkode blev afgivet af SQLite3: $err</p>
+	<p>Følgende fejlkode blev afgivet af SQLite3: $1</p>
 	<p>(mere information om fejlkoder kan findes på <a href="https://sqlite.org/c3ref/c_abort.html">sqlite3.org</a>.)</p>
 	<pre class="header">Mener du at dette er en fejl i systemet, så send følgende tekst til system operatøren:
 </pre>
-	<pre>\$cmd = sqlite3 \$db $sql<br/>\$err = $err</pre>
+	<pre>\$cmd = sqlite3 \$db $2<br/>\$err = $1</pre>
 
 EOT
 }
@@ -85,8 +90,8 @@ html_select_members() {
 	do
 		mem_id="$(echo $member | cut -d '|' -f 1 )"
 		mem_name="$(echo $member | cut -d '|' -f 2)"
-		if [ "$edit_member" -eq "$mem_id" ]; then
-			echo "<option selected=selecte±d value=$mem_id>$mem_name</option>"
+		if [ "$edit_member" == "$mem_id" ]; then
+			echo "<option selected=selected value=$mem_id>$mem_name</option>"
 		else
 			echo "<option value=$mem_id>$mem_name</option>"
 		fi
@@ -99,13 +104,14 @@ html_select_categories() {
 	do
 		cat_id="$(echo $category | cut -d '|' -f 1)"
 		cat_name="$(echo $category | cut -d '|' -f 2)"
-		if [ "$edit_category" -eq "$cat_id" ]; then
+		if [ "$edit_category" == "$cat_id" ]; then
 			echo "<option selected=selected value=\"$cat_id\">$cat_name</option>"
 		else
 			echo "<option value=$cat_id>$cat_name</option>"
 		fi
 	done
 }
+
 
 # ====
 # Plugin support
@@ -176,14 +182,14 @@ case " $(POST) " in
 		fi
 		sqlite3 $db "$sql"
 		local err=$?
-		if [ "$err" == "0" ]; then
+		if [ "$err" == "0" ] || [ "x$err" == "x" ]; then
 			header "$redir"
 			exit 0
 		else
 			header
 			html_tmpl 'header'
 			html_tmpl 'dashboard'
-			html_display_error
+			html_display_error "$err" "$sql"
 			html_tmpl 'footer'
 			exit 0
 		fi
@@ -210,7 +216,7 @@ case " $(POST) " in
 		TITLE="$TITLE - SQL Fejl!"
 		html_tmpl 'header'
 		html_tmpl 'dashboard'
-		html_display_error
+		html_display_error "$err" "$sql"
 		html_tmpl 'footer'
 		exit 0
 		;;

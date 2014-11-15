@@ -11,7 +11,7 @@ case " $(GET) " in
 			html_tmpl 'dashboard'
 			cat << EOT
 <div id="sidebar">
-	<a href="${script}?member&amp;edit&amp;memid=0">Tilføj medlem</a>
+	<a href="${script}?edit&amp;memid=0">TilfÃ¸j medlem</a>
 </div>
 <h2>Middelfart Lokal TV medlemmer:</h2>
 <table>
@@ -36,10 +36,10 @@ EOT
 				cat << EOT
 				<tr>
 					<td>$(btn_del "memid" "$member_id")</td>
-					<td><a href="${script}?member&amp;id=$member_id">$member_name</a></td>
+					<td><a href="${script}?member&amp;memid=$member_id">$member_name</a></td>
 					<td>$member_phone</td>
 					<td><a href="mailto:$member_email">$member_email</a></td>
-					<td><a href="${script}?member&amp;id=$member_id">$produced</a></td>
+					<td><a href="${script}?member&amp;memid=$member_id">$produced</a></td>
 				</tr>
 EOT
 			done
@@ -61,13 +61,13 @@ EOT
 			html_tmpl 'dashboard'
 			cat << EOT
 <div id="sidebar">
-	<a href="${script}?edit&amp;memid=$member">Redigér</a><br />
-	<a href="${script}?delete&amp;memid=$member">Slet</a>
+	<a href="${script}?edit&amp;id=$member">RedigÃ©r</a><br />
+	<a href="${script}?delete&amp;id=$member">Slet</a>
 </div>
 <h2>$member_name</h2>
 <b>Mobil</b>: $member_phone<br/>
 <b>E-Mail</b>: <a href="mailto:$member_email">$member_email</a><br/>
-<p>${member_name} har produceret følgende:</p>
+<p>${member_name} har produceret fÃ¸lgende:</p>
 <table>
 	<thead>
 		<tr>
