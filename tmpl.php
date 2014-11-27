@@ -15,6 +15,5 @@ include_once( "lib/core.php" );
 			</div>
 		</div>
 		<?php html_footer(); ?>
-		<script src="js/zepto.min.js"></script>
 	</body>
 </html>
