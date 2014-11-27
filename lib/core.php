@@ -19,9 +19,9 @@ function html_dashboard() {
 	<li class="dashbtn"><a href=".">Forside</a></li>
 	<li class="dashbtn"><a href="member.php">Medlemmer</a></li>
 	<li class="dashbtn"><a href="category.php">Kategorier</a></li>
-	<li class="dashbtn"><a href="project.php">Gennemse projekter</a></li>
-	<li class="dashbtn"><a href="project.php?create">Opret projekt</a></li>
-	<li class="dashbtn"><a href="report.php">Opret rapport</a></li>
+	<li class="dashbtn"><a href="project.php">Gennemse Projekter</a></li>
+	<li class="dashbtn"><a href="project.php?edit">Opret Projekt</a></li>
+	<li class="dashbtn"><a href="report.php">Opret Rapport</a></li>
 
 	<li class="dashbtn">
 		<form method="get" action="project.php">
@@ -49,7 +49,7 @@ function html_sidebar() {
 	<b>Nyligt oprettede projekter:</b>
 	<table>
 <?php
-	$query = $db->prepare( "SELECT id,title FROM projects ORDER BY id DESC LIMIT 15" );
+	$query = $db->query( "SELECT id,title FROM projects ORDER BY id DESC LIMIT 15" );
 	while( $row = $query->fetchArray() ) {
 ?>
 	<tr>
