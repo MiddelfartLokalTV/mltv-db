@@ -4,6 +4,7 @@ include_once( "lib/core.php" );
 if( isset( $_POST["category"] ) ) {
 	$cat = $_POST["category"];
 	$db->exec( "INSERT INTO categories VALUES( NULL, '" . $cat . "' )" );
+	header( "Location: category.php" );
 }
 ?>
 
@@ -20,7 +21,7 @@ if( isset( $_POST["category"] ) ) {
 				html_logo();
 				$categories = $db->query( "SELECT * FROM categories" );
 				while( $category = $categories->fetchArray() ) { ?>
-	<a href="project.php&amp;cat=<?php echo $category['id'] ?>"><?php echo htmlentities($category['name'])?></a>
+	<a href="project.php?cat=<?php echo $category['id'] ?>"><?php echo htmlentities($category['name'])?></a> <br/>
 			<?php	} ?>
 			<form action="category.php" method="post">
 				<input type="text" name="category" placeholder="Ny" />
@@ -29,6 +30,5 @@ if( isset( $_POST["category"] ) ) {
 			</div>
 		</div>
 		<?php html_footer(); ?>
-		<script src="js/zepto.min.js"></script>
 	</body>
 </html>
