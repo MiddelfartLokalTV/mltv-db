@@ -18,8 +18,7 @@ CREATE TABLE IF NOT EXISTS projects ( id INTEGER PRIMARY KEY,
 	timespan TEXT,
 	release DATE,
 	release_type INTEGER,
-	participants TEXT,
-	type INTEGER );
+	participants TEXT );
 
 /*
  * The categories table contains a category identifier 'id', and the name of the category.
@@ -41,7 +40,7 @@ CREATE TABLE IF NOT EXISTS members ( id INTEGER PRIMARY KEY,
 CREATE TABLE IF NOT EXISTS release_type ( id INTEGER PRIMARY KEY,
 	type TEXT );
 
-INSERT OR IGNORE INTO release_type( 0, "Ikke udsendt" );
-INSERT OR IGNORE INTO release_type( 10, "Udsendt" );
-INSERT OR IGNORE INTO release_type( 20, "Genudsendt" );
-INSERT OR IGNORE INTO release_type( 30, "Yderlig genudsendt" );
+INSERT OR IGNORE INTO release_type VALUES( 0, "Ikke udsendt" );
+INSERT OR IGNORE INTO release_type VALUES( 10, "Udsendt" );
+INSERT OR IGNORE INTO release_type VALUES( 20, "Genudsendt" );
+INSERT OR IGNORE INTO release_type VALUES( 30, "Yderlig genudsendt" );

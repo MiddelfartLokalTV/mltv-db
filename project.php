@@ -80,6 +80,10 @@ if( isset( $_POST["title"] ) ) {
 						$proj_release		= $project["release"];
 						$proj_rel_type	= $project["release_type"];
 						$proj_part			= $project["participants"];
+						$producer				= $db->querySingle( "SELECT name FROM members WHERE id == ".$proj_producer );
+						$editor					= $db->querySingle( "SELECT name FROM members WHERE id == ".$proj_editor );
+						$category				= $db->querySingle( "SELECT name FROM categories WHERE id == ".$proj_cat );
+						$release_type		= $db->querySingle( "SELECT type FROM release_type WHERE id == ".$proj_rel_type );
 					?>
 					<div id="sidebar">
 						<a href="project.php?edit&amp;id=<?php echo $proj?>">Redigér</a>
@@ -87,8 +91,32 @@ if( isset( $_POST["title"] ) ) {
 					<h3><? echo $proj ?>&nbsp; - &nbsp; <? echo $proj_title ?></h3>
 					<table id="project-view">
 						<tr>
-							<td><b>Producer</b>: <? echo $proj_producer ?></td>
+						<td><b>Producer</b>: <a href="member.php?id=<? echo $proj_producer ?>"><?echo $producer ?></a></td>
 							<td><b>Oprettet</b>: <? echo $proj_created ?></td>
+						</tr>
+						<tr>
+							<td><b>Kategori</b>: <a href="project.php?cat=<? echo $proj_cat ?>"><? echo $category ?></a></td>
+							<td><b>Redigering</b>: <a href="member.php?id=<? echo $proj_editor ?>"><? echo $editor ?></a></td>
+						</tr>
+						<tr>
+						<td><b>Beskrivelse</b>: <? echo $proj_desc ?></td>
+							<td></td>
+						</tr>
+						<tr>
+							<td><b>Musik</b>: <? echo $proj_music ?></td>
+							<td><b>Deltagere</b>: <? echo $proj_part ?></td>
+						</tr>
+						<tr>
+							<td><b>Forventet Færdig</b>: <? echo $proj_exp_done ?></td>
+							<td><b>Forventet Længde</b>: <? echo $proj_exp_len ?></td>
+						</tr>
+						<tr>
+							<td><b>Udgivet</b>: <? echo $proj_release ?></td>
+							<td><b>Aktuel Længde</b>: <? echo $proj_real_len ?></td>
+						</tr>
+						<tr>
+							<td><b>Tidsramme</b>: <? echo $proj_timespan ?></td>
+							<td><b>Udgivelsestype</b>: <? echo $release_type ?></td>
 						</tr>
 					</table>
 					<?php						
@@ -122,7 +150,7 @@ if( isset( $_POST["title"] ) ) {
 						<label>Projekt Navn:</label>
 						<input type="text" name="title" value="<? echo $proj_title ?>"/>
 						<label>Projekt Nummer:</label>
-							<? if( isset($proj) ) { ?>
+							<? if( $proj !== "" ) { ?>
 							<input type="text" name="id" readonly="readonly" value="<? echo $proj; ?>"/>
 							<? } else { ?>
 							<input type="text" name="id" placeholder="nyt" disabled="disabled" />
@@ -169,15 +197,32 @@ if( isset( $_POST["title"] ) ) {
 						<input type="date" name="exp_done" value="<? echo $proj_exp_done ?>"/>
 						<label>Forventet Længde: (TT:MM:SS)</label>
 						<input type="text" name="exp_length" value="<? echo $proj_exp_len ?>"/>
-						<label>Udgivet:</label>
-						<input type="date" name="release" value="<? echo $proj_release ?>"/>
 						<label>Aktuel Længde: (TT:MM:SS)</label>
 						<input type="text" name="real_length" value="<? echo $proj_real_len ?>"/>
+						<label>Udgivet:</label>
+						<input type="date" name="release" value="<? echo $proj_release ?>"/>
+						<label>Udgivelsestype:</label>
+						<select name="release_type">
+						<? $release_types = $db->query( "SELECT * FROM release_type" );
+						while( $rtype = $release_types->fetchArray() ) {
+							if( $rtype["id"] === $proj_rel_type ) { ?>
+							<option selected="selected" value="<? echo $rtype["id"] ?>"><? echo $rtype["type"] ?></option>
+								<? } else { ?>
+							<option value="<? echo $rtype["id"] ?>"><? echo $rtype["type"] ?></option>
+								<? } } ?>
+						</select>
 							<input type="submit" name="submit" style="display:none;"/>
 						</div>
 				</form>
-				<? } else {
-				$projects		= $db->query( "SELECT id, title FROM projects ORDER BY id DESC LIMIT 20" );
+<? } else {
+$startid = isset( $_GET["startid"] ) ? $_GET["startid"] : $db->querySingle( "SELECT MAX(id) FROM projects" );
+				$nextid = $startid + 20;
+				$previd = $startid - 20;
+				$proj_sql = "SELECT id,title FROM projects WHERE id <= ".$startid." ORDER BY id DESC LIMIT 20";
+				if( isset( $_GET["cat"] ) ) {
+					$proj_sql = "SELECT id,title FROM projects WHERE id <= ".$startid." AND category == " .$_GET["cat"]." ORDER BY id DESC LIMIT 20";
+				}
+				$projects		= $db->query( $proj_sql );
 				$categories	= $db->query( "SELECT * FROM categories" );
 ?>
 				<div id="sidebar">
@@ -201,6 +246,7 @@ if( isset( $_POST["title"] ) ) {
 <? } ?>
 				</tbody>
 			</table>
+			<a href="project.php?startid=<? echo $previd ?>">Ældre</a> | <a href="project.php?startid=<? echo $nextid ?>">Nyere</a>
 <? } ?>
 			</div>
 		</div>
