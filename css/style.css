@@ -27,6 +27,9 @@ a {
 a:hover {
 	color: #00b;
 }
+label {
+	display: block;
+}
 #wrapper {
 	background-color: #fff;
 	border-bottom: 0.1em solid #55f;
@@ -34,16 +37,23 @@ a:hover {
 #content {
 	padding: 1em;
 	min-height: 35em;
+	margin-top: 1.5em;
 }
 #dashboard {
+	background: rgba(255,255,255,0.9);
 	border-bottom: 0.1em solid #55f;
-	padding-bottom: 0.2em;
+	position: fixed;
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	max-height: 1.2em;
 }
 .dashbtn {
-	background: #fafafa;
+/*	background: #fafafa; */
 	display: inline;
 	padding: 0.2em;
-		padding-top: 0;
+	padding-top: 0;
+	padding-bottom: 0em;
 }
 .dashbtn:hover {
 	border-bottom: 0.1em solid #00cc10;
@@ -60,10 +70,16 @@ a:hover {
 #sidebar {
 	float: right;
 	border: 0.1em solid #ddd;
+	position: fixed;
+	top: 80px;
+	right: 20px;
 	box-shadow: 0 0.1em 0.1em #000;
 }
 #footer {
 	text-align: center;
+}
+.form_project {
+	display: block;
 }
 
 @media print {
@@ -81,10 +97,7 @@ a:hover {
 	#wrapper {
 		border: 0;
 	}
-	table {
-		border-collapse: collapse;
-	}
-	td {
-		padding-left: 0.5em;
+	label {
+		display: inline-block;
 	}
 }
