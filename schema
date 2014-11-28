@@ -4,7 +4,7 @@
  * The value 'participants' is simply a list of integers corresponding to an
  * id in the members variables.
  */
-CREATE TABLE projects ( id INTEGER PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS projects ( id INTEGER PRIMARY KEY,
 	title TEXT,
 	desc TEXT,
 	producer INTEGER,
@@ -12,16 +12,18 @@ CREATE TABLE projects ( id INTEGER PRIMARY KEY,
 	category INTEGER,
 	music TEXT,
 	created TEXT,
-	expected_done TEXT,
-	expected_length TEXT,
-	real_length TEXT,
-	release TEXT,
+	expected_done DATE,
+	expected_length DATE,
+	real_length DATE,
+	timespan TEXT,
+	release DATE,
+	release_type INTEGER,
 	participants TEXT );
 
 /*
  * The categories table contains a category identifier 'id', and the name of the category.
  */
-CREATE TABLE categories ( id INTEGER PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS categories ( id INTEGER PRIMARY KEY,
 	name TEXT );
 
 /*
@@ -30,8 +32,15 @@ CREATE TABLE categories ( id INTEGER PRIMARY KEY,
  * However, in spite of being optional, at least one of email or phone
  * should be mandatory for non-temporary (employed, etc) members.
  */
-CREATE TABLE members ( id INTEGER PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS members ( id INTEGER PRIMARY KEY,
 	name TEXT,
 	phone TEXT,
 	email TEXT );
 
+CREATE TABLE IF NOT EXISTS release_type ( id INTEGER PRIMARY KEY,
+	type TEXT );
+
+INSERT OR IGNORE INTO release_type VALUES( 0, "Ikke udsendt" );
+INSERT OR IGNORE INTO release_type VALUES( 10, "Udsendt" );
+INSERT OR IGNORE INTO release_type VALUES( 20, "Genudsendt" );
+INSERT OR IGNORE INTO release_type VALUES( 30, "Yderlig genudsendt" );
