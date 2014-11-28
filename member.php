@@ -81,7 +81,7 @@ if( isset( $_POST["name"] ) ) {
 					<input type="text" name="phone" value="<? echo $phone?>"/>
 				<label><b>E-Mail</b>:</label>
 					<input type="email" name="email" value="<? echo $email ?>" />
-				<input type="submit" style="display:none;"/>
+				<input type="submit" name="submit" style="display:none;"/>
 			</form>
 			<?php
 			?>

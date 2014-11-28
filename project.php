@@ -23,7 +23,6 @@ if( isset( $_POST["title"] ) ) {
 		$proj						= $_POST["id"];
 		$SQL = "UPDATE projects SET title = :title, desc = :desc, producer = :producer, editor = :editor, category = :category, music = :music, created = :created, expected_done = :expected_done, expected_length = :expected_length, real_length = :real_length, timespan = :timespan, release = :release, release_type = :release_type, participants = :participants WHERE id = ".$proj;
 	}
-	header( "Location: project.php?id=".$proj );
 	$stmt = $db->prepare( $SQL );
 	$stmt->bindValue( ":title", $proj_title, SQLITE3_TEXT );
 	$stmt->bindValue( ":desc", $proj_desc, SQLITE3_TEXT );
