@@ -43,8 +43,8 @@ if( isset( $_POST["title"] ) ) {
 	if( isset( $_POST["id"] ) ) {
 		$location = "Location: project.php?id=".$_POST["id"];
 	} else {
-		$id = $db->querySingle( "SELECT MAX(id) FROM projects", true );
-		$location = "Location: project.php?id=".$id["id"];
+		$id = $db->querySingle( "SELECT MAX(id) FROM projects");
+		$location = "Location: project.php?id=".$id;
 	}
 	header( $location );
 	exit(0);
@@ -215,6 +215,11 @@ if( isset( $_POST["title"] ) ) {
 				</form>
 <? } else {
 $startid = isset( $_GET["startid"] ) ? $_GET["startid"] : $db->querySingle( "SELECT MAX(id) FROM projects" );
+				if( !isset( $startid ) OR $startid == null )
+				{
+					// this shouldn't really happen, but it does in testing so fuck it.
+					$startid = 0;
+				}
 				$nextid = $startid + 20;
 				$previd = $startid - 20;
 				$proj_sql = "SELECT id,title FROM projects WHERE id <= ".$startid." ORDER BY id DESC LIMIT 20";
