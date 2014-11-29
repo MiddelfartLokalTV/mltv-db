@@ -1,24 +1,26 @@
 <?php
 include_once( "lib/core.php" );
 if( isset( $_POST["name"] ) ) {
-		$id = isset( $_POST["id"] ) ? $_POST["id"] : "";
-		if( strcmp($id,"") === 0 ) {
-			// no id given, INSERT
-			$name		= isset( $_POST["name"] ) ? $_POST["name"] : "";
-			$phone	= isset( $_POST["phone"] ) ? $_POST["phone"] : "";
-			$email	= isset( $_POST["email"] ) ? $_POST["email"] : "";
-			$db->exec( "INSERT INTO members VALUES( NULL, '".$name."','".$phone."','".$email."')" );
-			$id = $db->querySingle( "SELECT MAX(id) FROM members" );
-			header( "Location: member.php?id=" . $id["id"] );
-		} else {
-			// id received, UPDATE
-			$stmt = $db->prepare( "UPDATE members SET name = :name, phone = :phone, email = :email WHERE id == ". $id );
-			$stmt->bindValue( ":name", $_POST["name"], SQLITE3_TEXT );
-			$stmt->bindValue( ":phone", $_POST["phone"], SQLITE3_TEXT );
-			$stmt->bindValue( ":email", $_POST["email"], SQLITE3_TEXT );
-			$stmt->execute();
-			header( "Location: member.php?id=" . $id );
-		}
+	$id = isset( $_POST["id"] ) ? $_POST["id"] : "";
+	$name		= isset( $_POST["name"] ) ? $_POST["name"] : "";
+	$phone	= isset( $_POST["phone"] ) ? $_POST["phone"] : "";
+	$email	= isset( $_POST["email"] ) ? $_POST["email"] : "";
+	$SQL = "INSERT INTO members VALUES( NULL, :name, :phone, :email );";
+	$location = "Location: member.php?id=".$id;
+	if( strcmp($id,"") === 0 ) {
+		// no id given, INSERT
+		$id = $db->querySingle( "SELECT MAX(id) FROM members" );
+		$location = "Location: member.php?id=".$id;
+	} else {
+		// id received, UPDATE
+		$SQL = "UPDATE members SET name = :name, phone = :phone, email = :email WHERE id == " . $id;
+	}
+	$stmt = $db->prepare( "UPDATE members SET name = :name, phone = :phone, email = :email WHERE id == ". $id );
+	$stmt->bindValue( ":name", $name, SQLITE3_TEXT );
+	$stmt->bindValue( ":phone", $phone, SQLITE3_TEXT );
+	$stmt->bindValue( ":email", $email, SQLITE3_TEXT );
+	$stmt->execute();
+	header( $location );
 }
 ?>
 
