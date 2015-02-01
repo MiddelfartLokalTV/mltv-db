@@ -9,13 +9,13 @@ if( isset( $_POST["name"] ) ) {
 	$location = "Location: member.php?id=".$id;
 	if( strcmp($id,"") === 0 ) {
 		// no id given, INSERT
-		$id = $db->querySingle( "SELECT MAX(id) FROM members" );
+		$id = $db->querySingle( "SELECT MAX(id) FROM members" ) + 1;
 		$location = "Location: member.php?id=".$id;
 	} else {
 		// id received, UPDATE
 		$SQL = "UPDATE members SET name = :name, phone = :phone, email = :email WHERE id == " . $id;
 	}
-	$stmt = $db->prepare( "UPDATE members SET name = :name, phone = :phone, email = :email WHERE id == ". $id );
+	$stmt = $db->prepare( $SQL );
 	$stmt->bindValue( ":name", $name, SQLITE3_TEXT );
 	$stmt->bindValue( ":phone", $phone, SQLITE3_TEXT );
 	$stmt->bindValue( ":email", $email, SQLITE3_TEXT );
