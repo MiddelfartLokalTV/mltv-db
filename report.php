@@ -1,18 +1,10 @@
 <?php
 include_once( "lib/core.php" );
-?>
 
-<!doctype html>
-<html>
-	<head>
-		<?php html_header($TITLE . " - Rapport"); ?>
-	</head>
-	<body>
-		<div id="wrapper">
-			<?php html_dashboard(); ?>
-			<div id="content">
-				<?php html_logo(); ?>
-				<? if( isset( $_POST["startdate"] ) AND isset( $_POST["enddate"] ) ) {
+$page = new Page( "default" );
+$page->Render( "header", "MLTV - Rapport" );
+$page->Render( "logo", [] );
+if( isset( $_POST["startdate"] ) AND isset( $_POST["enddate"] ) ) {
 				$projects = $db->query( "SELECT * FROM projects WHERE release BETWEEN '" . $_POST["startdate"] . "' AND '" . $_POST["enddate"] . "'" );
 
 				while ( $project = $projects->fetchArray() ) {
@@ -71,11 +63,4 @@ include_once( "lib/core.php" );
 				<? } ?>
 			</div>
 		</div>
-		<?php html_footer(); ?>
-<script>
-function reportCreate() {
-				document.getElementById("form_report").submit.click();
-			}
-		</script>
-	</body>
-</html>
+<?php $page->Render( "footer", [] ) ?>

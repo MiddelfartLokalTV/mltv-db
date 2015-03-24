@@ -49,20 +49,13 @@ if( isset( $_POST["title"] ) ) {
 	header( $location );
 	exit(0);
 }
-?>
 
-<!doctype html>
-<html>
-	<head>
-		<?php html_header($TITLE . " - Projekt"); ?>
-	</head>
-	<body>
-		<div id="wrapper">
-			<?php html_dashboard(); ?>
-			<div id="content">
-				<?php html_logo(); ?>
-				<?php if( isset( $_GET["id"] ) and !isset( $_GET["edit"] ) ) {
-					if( $_GET["id"] != 0 && $_GET["id"] != "" ) {	
+$page = new Page( "default" );
+$page->Render( "header", array( "title" => "MLTV - Projekt" ) );
+$page->Render( "logo", [] );
+
+if( isset( $_GET["id"] ) and !isset( $_GET["edit"] ) ) {
+	if( $_GET["id"] != 0 and $_GET["id"] != "" ) {	
 						$project				= $db->query( "SELECT * FROM projects WHERE id == " . $_GET["id"] )->fetchArray();
 						$proj						= $project["id"];
 						$proj_title			= $project["title"];
@@ -254,11 +247,5 @@ $startid = isset( $_GET["startid"] ) ? $_GET["startid"] : $db->querySingle( "SEL
 <? } ?>
 			</div>
 		</div>
-		<?php html_footer(); ?>
-				<script>
-				function projectSave() {
-					document.getElementsByTagName("form")[1].submit.click();
-				}
-		</script>
-	</body>
-</html>
+<?php $page->Render( "footer", [] ) ?>	
+

@@ -22,19 +22,13 @@ if( isset( $_POST["name"] ) ) {
 	$stmt->execute();
 	header( $location );
 }
-?>
 
-<!doctype html>
-<html>
-	<head>
-		<?php html_header($TITLE . " - Medlemmer"); ?>
-	</head>
-	<body>
-		<div id="wrapper">
-			<?php html_dashboard(); ?>
-			<div id="content">
-				<?php html_logo(); ?>
-<?php if( isset( $_GET["id"] ) and !isset( $_GET["edit"] ) ) {
+$page = new Page( "default" );
+
+$page->Render( "header", array( "title" => "MLTV - Medlemmer" ) );
+$page->Render( "logo", [] );
+
+if( isset( $_GET["id"] ) and !isset( $_GET["edit"] ) ) {
 			$member = isset( $_GET["id"] ) ? $db->querySingle("SELECT * FROM members WHERE id == " . $_GET["id"], true ) : "";
 			// Ensure that these variables are NOT empty, and set their correct values
 			// if they exist.
@@ -119,11 +113,6 @@ if( isset( $_POST["name"] ) ) {
 				</table>
 			</div>
 		</div>
-		<?php html_footer(); ?>
-		<script>
-			function memberSave() {
-				document.getElementsByTagName("form")[1].submit.click();
-			}		
-		</script>
-	</body>
-</html>
+
+<?php $page->Render( "footer", [] );
+
