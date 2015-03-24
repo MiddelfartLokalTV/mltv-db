@@ -1,19 +1,11 @@
 <?php
 include_once( "lib/core.php" );
+$page = new Page( "default" );
+$page->Render( "header", array( "title" => "MLTV - Forside" ) );
+$page->Render( "logo", [] );
 ?>
 
-<!doctype html>
-<html>
-	<head>
-		<?php html_header($TITLE . " - Forside"); ?>
-	</head>
-	<body>
-		<div id="wrapper">
-			<?php html_dashboard(); ?>
-			<div id="content">
-				<?php html_logo(); ?>
-			</div>
-		</div>
-		<?php html_footer(); ?>
-	</body>
-</html>
+<h2>Hello, World!</h2>
+
+<? $page->Render( "footer", [] ); ?>
+
