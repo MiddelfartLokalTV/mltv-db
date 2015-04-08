@@ -37,29 +37,4 @@ class Page {
 	}
 }
 
-function html_header($TITLE) {
-?>
-<?php
-}
-
-function html_dashboard() {
-?>
-<?php
-}
-
-function html_logo () {
-?>
-<?php
-}
-
-function html_sidebar() {
-	global $db;
-?>
-<?php
-}
-
-function html_footer() {
-?>
-<?php
-}
 ?>
